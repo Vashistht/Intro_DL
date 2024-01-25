@@ -1,0 +1,46 @@
+
+\section{Question 1}
+
+\begin{itemize}
+    \item  Filter all samples representing digits `0' or `1' from the MNIST datasets.
+    
+    \item Randomly split the training data into a training set (80\% training samples) of a validation set (20\% training samples). 
+    
+    \item Define an MLP with 1 hidden layer and train the MLP to classify the digits `0' vs `1'. Report your MLP design and training details (which optimizer, number of epochs, learning rate, etc.) 
+    
+    \item Keep other hyper-parameters the same, and train the model with different batch sizes: 2, 16, 128, 1024. Report the time cost, training, validation and test set accuracy of your mode
+\end{itemize}
+
+\begin{solve}
+
+    \subsection{Model for binary classificaiton}
+
+    \begin{lstlisting}[language=python]
+    print(model)
+
+    SimpleMLP(
+        (fc1): Linear(in_features=784, out_features=5, bias=True)
+        (activation): Sigmoid()
+        (fc2): Linear(in_features=5, out_features=2, bias=True)
+    )
+    \end{lstlisting}
+
+
+    \subsection*{Effect of batch performance on the model performance and train time}
+
+    \begin{table}[H]
+        \centering
+        \begin{tabular}{rrrrrr}
+            \toprule
+            Batch size & Training Time (s) & Train Acc &  Val Acc & Test Acc \\
+            \midrule
+            2 & 16.724894 & 99.911173 & 99.684169 & 99.669031 \\
+            16 & 5.800792 & 99.960521 & 99.842084 & 99.952719 \\
+            128 & 4.362510 & 99.891433 & 99.881563 & 99.905437 \\
+            1024 & 3.937332 & 99.595341 & 99.526253 & 99.574468 \\
+            \bottomrule
+        \end{tabular}
+        \caption{Comparing the performance of SimpleMLP model for different batch sizes 2, 16, 128, 1024}
+    \end{table}
+    
+\end{solve}

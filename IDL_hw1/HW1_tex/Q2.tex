@@ -1,0 +1,200 @@
+
+\section{Question 2}
+
+\begin{itemize}
+    \item  Implement the training loop and evaluation section. Report the hyper-parameters you choose
+    
+    \item Experiment with different numbers of neurons in the hidden layer and note any changes in performance.
+    
+    \item Write a brief analysis of the model’s performance, including any challenges faced and how they were addressed
+\end{itemize}
+
+\begin{solve}
+
+    \subsection{Model for multi-class (10 digits) classificaiton}
+
+    \begin{lstlisting}[language=python]
+print(model)
+hidden_dim = int(np.sqrt(28*28*10)) # changed in hyperopt
+
+MulticlassMLP(
+    (fc1): Linear(in_features=784, out_features=88, bias=True)
+    (activation): Sigmoid()
+    (fc2): Linear(in_features=88, out_features=10, bias=True)
+)
+
+# criterion = nn.CrossEntropyLoss()
+
+    \end{lstlisting}
+
+
+    \subsection{Hyper parameter optimization for Multi-Class Optimization}
+    
+    I first experimented with device to see the most optimal device for training between cpu and the gpu on my Mac-M1 Pro. The results are given in the appendix for the model with sigmoid. For each of them we found that \textbf{device = 'cpu'} was faster than  \textbf{device = 'mps'} (mac gpu in M1 Pro).
+
+    \subsubsection{Results:}
+    Two models were optimized for this task, one with sigmoid activiation and the other with ReLU activation.
+
+    \begin{enumerate}
+        \item \textbf{Sigmoid Activation Layer}
+        
+        \begin{lstlisting}[language=python]
+print(model)
+hidden_dim = int(np.sqrt(28*28*10)) 
+# hidden_dim changed in hyperopt later
+MulticlassMLP(
+    (fc1): Linear(in_features=784, out_features=88, 
+    bias=True)
+    (activation): Sigmoid()
+    (fc2): Linear(in_features=88, out_features=10, 
+    bias=True)
+)
+# criterion = nn.CrossEntropyLoss()
+        \end{lstlisting}
+
+
+        The hyper-parameters tested are as follows 
+        \begin{lstlisting}[language=python]
+batch_sizes = [64, 128, 1024]
+optimizers = ['adam', 'sgd']
+# learning_rates= [1e-4, 1e-3, 1e-2, 1e-1]
+hidden_dims = [4, 32, 64, 128]
+        \end{lstlisting}
+        
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        \begin{table}[H]
+            \centering
+        \begin{tabular}{rlrlrrrrrr}
+            \toprule
+            Opt\# & Batch & Opt & LR & HidDim& Training Time & Train Acc & Val Acc & Test Acc \\
+            \midrule
+            0 & 64 & adam & 0.001& 4 & 20.822481 & 81.116667 & 80.50 & 81.34 \\
+            1 & 64 & adam & 0.001& 32 & 21.138930 & 95.725& 94.583333 & 94.83 \\
+            2 & 64 & adam & 0.001& 64 & 22.073092 & 97.208333 & 95.566667 & 96.09 \\
+            \rowcolor{yellow!50}
+            3 & 64 & adam & 0.001& 128 & 22.682774 & 98.10 & 96.591667 & 96.87 \\
+            4 & 64 & sgd & 0.01 & 4 & 19.016016 & 69.941667 & 70.083333 & 70.49 \\
+            5 & 64 & sgd & 0.01 & 32 & 19.240644 & 89.883333 & 89.666667 & 90.33 \\
+            6 & 64 & sgd & 0.01 & 64 & 19.526299 & 90.029167 & 89.866667 & 90.57 \\
+            \rowcolor{orange!50}
+            7 & 64 & sgd & 0.01 & 128 & 20.448700 & 90.037500 & 89.85 & 90.69 \\
+            8 & 128 & adam & 0.001& 4 & 18.587870 & 74.941667 & 73.933333 & 75.06 \\
+            9 & 128 & adam & 0.001& 32 & 18.807421 & 95.029167 & 94.341667 & 94.47 \\
+            10 & 128 & adam & 0.001& 64 & 19.121340 & 96.412500 & 95.416667 & 95.75 \\
+            \rowcolor{yellow!50}
+            11 & 128 & adam & 0.001& 128 & 20.281624 & 97.404167 & 96.433333 & 96.45 \\            
+            12 & 128 & sgd & 0.01 & 4 & 17.898255 & 63.181250 & 63.475& 64.90 \\
+            13 & 128 & sgd & 0.01 & 32 & 17.976289 & 87.287500 & 87.291667 & 88.10 \\
+            14 & 128 & sgd & 0.01 & 64 & 18.428340 & 87.922917 & 87.775& 88.92 \\
+            15 & 128 & sgd & 0.01 & 128 & 18.753883 & 87.927083 & 87.90 & 88.73 \\
+            \rowcolor{red!50}
+            16 & 1024 & adam & 0.001& 4 & 17.380155 & 52.65 & 52.416667 & 53.09 \\
+            17 & 1024 & adam & 0.001& 32 & 17.465012 & 90.939583 & 90.625& 91.21 \\
+            18 & 1024 & adam & 0.001& 64 & 17.708344 & 92.270833 & 91.866667 & 92.49 \\
+            19 & 1024 & adam & 0.001& 128 & 18.143819 & 93.297917 & 92.766667 & 93.21 \\
+            \rowcolor{red!50}
+            20 & 1024 & sgd & 0.01 & 4 & 17.723570 & 20.575& 22.00 & 23.66 \\
+            21 & 1024 & sgd & 0.01 & 32 & 17.807459 & 62.589583 & 63.075& 65.17 \\
+            22 & 1024 & sgd & 0.01 & 64 & 18.086973 & 67.327083 & 66.508333 & 68.73 \\
+            23 & 1024 & sgd & 0.01 & 128 & 18.751791 & 70.679167 & 70.291667 & 71.88 \\
+            \bottomrule
+            \end{tabular}
+            \caption{Hyperopt results for different optmizers, learning rate, batch size, and hidden dimension of the MulticlassMLP Network with sigmoid activation layer}
+            \label{TableHyperoptSigmoid}
+        \end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+        \item \textbf{ReLU Activation Layer}
+
+        \begin{lstlisting}[language=python]
+class MulticlassMLP(nn.Module):
+    def __init__(self, in_dim, hidden_dim, out_dim):
+        super(MulticlassMLP, self).__init__()
+        self.fc1 = nn.Linear(in_dim, hidden_dim)
+        self.activation = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_dim, out_dim)
+        
+    def forward(self, x):
+        # Your code goes here
+        x = self.fc1(x)
+        x = self.activation(x)
+        x = self.fc2(x)
+        
+        return x
+
+# criterion = nn.CrossEntropyLoss()
+    \end{lstlisting}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}[H]
+    \centering
+\begin{tabular}{rlrlrrrrrr}
+    Opt\# & Batch & Opt & LR & HidDim& Training Time & Train Acc & Val Acc & Test Acc\\
+    \midrule
+    \rowcolor{red!50}
+    0 & 64 & adam & 0.001 & 4 & 22.202067 & 33.362500 & 33.991667 & 34.13 \\
+    1 & 64 & adam & 0.001 & 32 & 22.753937 & 95.647917 & 94.566667 & 95.12 \\
+    \rowcolor{yellow!50}
+    2 & 64 & adam & 0.001 & 64 & 23.678958 & 97.191667 & 96.525 & 96.80 \\
+    3 & 64 & adam & 0.001 & 128 & 24.853068 & 98.108333 & 96.425 & 96.53 \\
+    4 & 64 & sgd & 0.01 & 4 & 21.199240 & 82.979167 & 82.091667 & 82.65 \\
+    5 & 64 & sgd & 0.01 & 32 & 23.314560 & 92.931250 & 92.458333 & 92.94 \\
+    6 & 64 & sgd & 0.01 & 64 & 24.677200 & 93.55 & 93.05 & 93.49 \\
+    \rowcolor{orange!50}
+    7 & 64 & sgd & 0.01 & 128 & 23.671364 & 93.885417 & 93.608333 & 94.10 \\
+    8 & 128 & adam & 0.001 & 4 & 20.069331 & 65.714583 & 65.108333 & 66.38 \\
+    9 & 128 & adam & 0.001 & 32 & 21.104044 & 93.787500 & 92.925 & 93.34 \\
+    10 & 128 & adam & 0.001 & 64 & 22.600291 & 96.437500 & 95.45 & 95.97 \\
+    \rowcolor{yellow!50}
+    11 & 128 & adam & 0.001 & 128 & 24.154394 & 97.735417 & 96.30 & 96.72 \\
+    12 & 128 & sgd & 0.01 & 4 & 20.192016 & 81.056250 & 80.933333 & 81.43 \\
+    13 & 128 & sgd & 0.01 & 32 & 19.052993 & 91.445833 & 91.433333 & 92.05 \\
+    14 & 128 & sgd & 0.01 & 64 & 19.173184 & 91.566667 & 91.241667 & 91.92 \\
+    15 & 128 & sgd & 0.01 & 128 & 20.031956 & 91.764583 & 91.458333 & 92.31 \\
+    \rowcolor{red!50}
+    16 & 1024 & adam & 0.001 & 4 & 17.754258 & 40.585417 & 41.825 & 41.90 \\
+    17 & 1024 & adam & 0.001 & 32 & 17.710765 & 91.395833 & 91.466667 & 91.97 \\
+    18 & 1024 & adam & 0.001 & 64 & 18.001581 & 93.037500 & 92.708333 & 93.05 \\
+    19 & 1024 & adam & 0.001 & 128 & 18.118424 & 94.625 & 94.158333 & 94.60 \\
+    20 & 1024 & sgd & 0.01 & 4 & 17.477235 & 53.318750 & 53.15 & 54.65 \\
+    21 & 1024 & sgd & 0.01 & 32 & 17.538370 & 85.191667 & 84.941667 & 85.86 \\
+    22 & 1024 & sgd & 0.01 & 64 & 17.841422 & 86.214583 & 86.075 & 87.12 \\
+    23 & 1024 & sgd & 0.01 & 128 & 18.008393 & 86.645833 & 86.491667 & 87.38 \\
+    \bottomrule
+    \end{tabular}
+    \caption{Hyperopt results for different optmizers, learning rate, batch size, and hidden dimension of the MulticlassMLP Network with ReLU activation layer}
+    \label{tb:TableHyperoptRelu}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%
+    \end{enumerate}
+
+    \subsubsection{Conclusion}
+    From \ref{TableHyperoptSigmoid} and \ref{tb:TableHyperoptRelu}, we see that the highlighted rows.
+
+    The \textbf{yellow} rows highlight the highest performing hyper-parameters for `adam', highest performing hyper-parameters for `sgd' are highligted in \textbf{orange}, and \textbf{red} highligts the worse performances across the two optimizers.
+
+    \begin{itemize}
+        \item  Sigmoid Activation
+        
+        for batch size, optimizer, learning rate, hidden dimension,  
+        64 & adam & 0.001& 128 & 22.682774 & 98.10 & 96.591667 & 96.87
+        
+        We get a train accuracy of 97.19\%, validation accuracy of 96.52\%, and the test accuracy of 96.80\%.
+
+
+        \item Sigmoid Activation
+        
+        3 & 64 & adam & 0.001& 128 & 22.682774 & 98.10 & 96.591667 & 96.87
+        
+        We get a train accuracy of 98.10\%, validation accuracy of 96.59\%, and the test accuracy of 96.87\%.
+
+        \item Sigmoid Activation
+        
+        7 & 64 & sgd & 0.01 & 128 & 23.671364 & 93.885417 & 93.608333 & 94.10
+
+        We get a train accuracy of  93.88\%, validation accuracy of 993.60\%, and the test accuracy of 94.10\%.
+
+    \end{itemize}
+
+\end{solve}
