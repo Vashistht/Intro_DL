@@ -1,0 +1,326 @@
+\section{Question 3}
+
+\begin{itemize}
+    \item  Create the imbalance datasets with all ``0'' digits and only 1\% ``1'' digits
+    \item  Implement the training loop and evaluation section (implementing the $F_1$ metric)
+    \item Ignore the class imbalance problem and train the MLP. Report your hyper-parameter details
+    and the $F_1$ score performance on the test set (as the baseline)
+    \item Explore modifications to improve the performance of the class imbalance problem. Report
+    your modifications and the $F_1$ scores performance on the test set.
+    \item Can you propose new ways for the class imbalance problem and achieve stable and satisfactory performance for large N = 500, 1000, $\dots$?
+\end{itemize}
+
+\begin{solve}
+
+    \textbf{
+    Extra credit (exploring the performance of the network for large N is done with the small N of 100, look at the tables for more details) }
+
+    Model used was the same as the one used in question 1 for binary classifciation.
+
+    \begin{lstlisting}[language=python]
+SimpleMLP(
+  (fc1): Linear(in_features=784, out_features=4, bias=True)
+  (activation): ReLU()
+  (fc2): Linear(in_features=4, out_features=2, bias=True)
+)
+\end{lstlisting}
+
+    \subsubsection{Creation of Imbalanced Dataset where we sample every $N^{th}$ point}
+    
+    \textbf{We vary N from 100, then from 250 to 2000 with increments of 250 each. Thus the list $N_{list}$ varies from 100, 250, 500,..., 2000}
+
+    \begin{lstlisting}[language=python]
+train_0_original = [data for data in mnist if data[1] == 0]
+train_1_original = [data for data in mnist if data[1] == 1]
+
+# List of Ns (we sample every Nth point from list of 1s)
+N_list = [100] + [250*(i+1) for i in range(8)]
+
+for N in N_list:
+    train_0 = train_0_original.copy()
+    train_1 =  train_1_original.copy()
+    random.shuffle(train_1)
+    train_1 = train_1[:len(train_1) // N]
+    print(N, 'Train set (before sparsing)',
+     len(train_0), len(train_1), len(train_1) + len( train_0) )
+
+    # Split training data (1s)into training and validation sets
+    train_1len = int(len(train_1) *.8)
+    val_1len = len(train_1) - train_1len
+    train1_set, val1_set = random_split(train_1, [train_1len, val_1len])
+
+    # Split training data (0s) into training and validation sets
+    train_0len = int(len(train_0) *.8)
+    val_0len = len(train_0) - train_0len
+    train0_set, val0_set = random_split(train_0, [train_0len, val_0len])
+
+    # combining 0 and 1s to get train and val sets
+    train_set = train0_set + train1_set
+    val_set = val0_set + val1_set
+    len(train_set), len(val_set)
+
+    # creating test set
+    test_0 = [data for data in mnist_test if data[1] == 0]
+    test_1 = [data for data in mnist_test if data[1] == 1]
+    print(N,'Test set (before sparsing)',
+    len(test_0), len(test_1), len(test_1) + len( test_0) )
+
+    test_1 = test_1[:len(test_1) // N]
+    print(N,'Test set (after sparsing)'
+    ,len(test_0), len(test_1), len(test_1) + len( test_0) )
+    test_set = test_0 + test_1
+    print('\n')
+
+    # Define DataLoaders to access data in batches
+    train_loader = DataLoader(train_set, batch_size=64, shuffle=True)
+    val_loader = DataLoader(val_set, batch_size = 64, shuffle=False)
+    test_loader = DataLoader(test_set, batch_size = 64, shuffle=False)
+    \end{lstlisting}
+    
+
+    \subsubsection{Implement $F_1$ metric}
+
+
+\begin{lstlisting}[language=python, title= $F_1 Function$]
+def precision_score(labels, predictions):
+    predictions, labels = np.array(labels), np.array(predictions)
+    predictions_1 = np.sum(predictions==1)
+    correct_1 = np.sum( (predictions==1) & (labels==1))
+    precision = correct_1/ predictions_1 if predictions_1 > 0 else 1e-6
+    return precision
+
+def recall_score(labels, predictions):
+    predictions, labels = np.array(labels), np.array(predictions)
+    correct_1 = np.sum( (predictions==1) & (labels==1))
+    labels_1 = np.sum(labels==1)
+    recall = correct_1/ labels_1 if labels_1 > 0 else 1e-6
+    return recall
+
+def f1_score(labels, predictions):
+    precision = precision_score(labels, predictions)
+    recall = recall_score(labels, predictions)
+    f1 = (2 * (recall * precision)) / (precision + recall)
+    return f1
+\end{lstlisting}
+
+Now we implement this in the val and test loops:
+\begin{lstlisting}[language=python, title= Validation Loop]
+# validation
+val_loss = count = 0
+correct = total = 0
+val_preds = []; val_labels=[]
+for data, target in val_loader:
+    data, target = data.to(device), target.to(device)
+    data = data.view(data.size(0), -1)
+    output = model(data)
+    val_loss += criterion(output, target).item()
+    count += 1
+    pred = output.argmax(dim=1)
+    correct += (pred == target).sum().item()
+    total += data.size(0)
+    val_preds.append(pred)
+    val_labels.append(target)
+    # print(type(target))
+
+# concat preds and true labels across all batches
+val_preds = torch.cat(val_preds).numpy()
+val_labels = torch.cat(val_labels).numpy()
+assert len(val_preds) == len(val_set)
+
+val_loss = val_loss / count
+val_acc = 100. * correct / total
+# print(f'Validation loss: {val_loss:.2f}, accuracy: {val_acc:.2f}%')
+f1_validation = f1_score(labels = val_labels, predictions = val_preds)
+# print(f'F1 score validation: {f1_validation:.2f}')
+\end{lstlisting}
+
+\begin{lstlisting}[language=python, title=Test Loop]
+# test
+model.eval()
+correct = total = 0
+test_preds = []; test_labels=[]
+
+with torch.no_grad():
+    for data, target in test_loader:
+        data, target = data.to(device), target.to(device)
+        data = data.view(data.size(0), -1)
+        output = model(data)
+        pred = output.argmax(dim=1)
+        correct += (pred == target).sum().item()
+        total += data.size(0)
+        test_preds.append(pred)
+        test_labels.append(target)
+
+# concat preds and true labels across all batches
+test_preds = torch.cat(test_preds).numpy() 
+test_labels = torch.cat(test_labels).numpy()
+assert len(test_preds) == len(test_set)   
+test_acc = 100. * correct / total
+# print(f'Test Accuracy: {test_acc:.2f}%')
+# print(f'Validation loss: {val_loss:.2f}, accuracy: {val_acc:.2f}%')
+f1_test = f1_score(labels = test_labels, predictions =test_preds)
+# print(f'F1 score test: {f1_test:.2f}')
+\end{lstlisting}
+
+
+
+
+\subsubsection{Analysis of the model performance for different degrees of sparsity (larger N means more sparse dataset)}
+
+\textbf{Structure:} 
+
+For testing the performance, we use two different data sets. One is the original (unsparsed test dataset), the other sparsed data set (where we sample every Nth datapoint). The model is trained and validated on the sparse datasets but we test on the different datasets.
+
+\begin{enumerate}
+    \item {Performance on sparsed test data}
+    
+    \begin{figure}[H]
+        \includegraphics[scale=.7]{plots/No_mods.png}
+        \caption{no modifications, test: sparsted data where N shows every Nth data point from the train, validation, and test datasets were sampled}
+        \label{no_mods}
+    \end{figure}
+
+    \item {Performance on original/unsparsed test data}
+    \begin{figure}[H]
+        \includegraphics[scale=.7]{plots/No_mods_unsparsed.png}
+        \caption{no modifications, here N shows every Nth data point from the train, validation were sampled. Test data remained unchanged}
+        \label{no_mods_og}
+    \end{figure}
+
+    \item {Observations}
+    We see that the model despite sparsity in Fig~\ref{no_mods} that eveen for sparsity of upto 1000, the model does really well in terms of $F_1$ score. $N=250$ is an exception but it was just this specific run, meaning pictures that model found hard were selected which increased the average loss count compared to other runs. 
+
+    Despite having a very different distribution to the train and validation, in the case of the original unsparsed test data, we see in Fig~\ref{no_mods_og} that the $F_1$ score is lesser (which is what we would expect given it no more follows the sparsed dataset distribution that our model is trained on). However, it is still acceptable for $N=750$ hovering around $.95$. 
+
+    In both cases, we see that for $N>1000$, the $F_1$ score drops considerably. In the case of sparsed dataset it drops down to $0$ because there is no $1$ in the test dataset. In the case of original dataset too we see a drop, that is somehow back up again for $N=1500$. 
+
+    Thus, we see a huge bottle neck for the two methods at the 1000 threshold.
+\end{enumerate}
+
+
+
+\subsubsection{Adjusted Class Weights in the Loss Function: Aalysis of the model performance for different degrees of sparsity for different loss weights}
+
+\textbf{Structure:} 
+
+For testing the performance, we use two different data sets. One is the original (unsparsed test dataset), the other sparsed data set (where we sample every Nth datapoint). The model is trained and validated on the sparse datasets but we test on the different datasets.
+
+\begin{lstlisting}[language=python, title = Adjusting the weight in the loss function]
+# reweight_factor = weight[1]/ weight[0] 
+model = SimpleMLP(in_dim=28 * 28,
+hidden_dim=hidden_dim,
+out_dim=2).to(device)
+criterion = nn.CrossEntropyLoss(weight = weight)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-2)
+num_epochs = 10
+\end{lstlisting}
+
+In the table, the $Weight$ means how much more the sparse class (\textbf{1}) was over weighted in the loss function in comparsion to $0$. 
+
+For each of the $N$, four different weights were tried:
+$\left[1, \frac{N}{10}, \frac{N}{2}, \frac{len(train 0)}{len(train 1)}\right]$
+
+\begin{enumerate}
+    \item {Performance on sparsed test data}
+    
+    \begin{figure}[H]
+        \includegraphics[scale=.72]{plots/2_weight_sparsed.png}
+        \caption{Adjusted Class weights in the  Loss Function, test: sparsted data where N shows every Nth data point from the train, validation, and test datasets were sampled}
+        \label{weight_mod_on_sparsed_test}
+    \end{figure}
+
+    \item {Performance on original/unsparsed test data}
+    \begin{figure}[H]
+        \includegraphics[scale=.72]{plots/2_weight_og.png}
+        \caption{Adjusted Class weights in the  Loss Function, test: sparsted data where N shows every Nth data point from the train, validation. Test datasets was left as original test data set}
+        \label{weight_mod_on_unsparsed_test}
+    \end{figure}
+
+    \item {Observations}
+    
+    Across both the sparsed and the unsparsed dataset we see huge improvements in the $F_1$ scores for the validation dataset, which shows that the weighting works well. We note  that the weight of $1$ for each class does as expected (from previous Fig~\ref{weight_mod_on_sparsed_test} till $N=750$. But it drops down to 0 at $N\geq 1000$, because there is no data point belonging to 1 class in test dataset.
+
+    We also note that in  Fig~\ref{weight_mod_on_sparsed_test}, higher weights of $ \frac{N}{10}, \frac{len(train 0)}{len(train 1)}$ for the sparse classes do decently well for $N=1000$. They suffer the same problem for $N>1000$ because the test set has no $1s$
+
+    Despite having a very different distribution to the train and validation, in the case of the original unsparsed test data, we see in Fig~\ref{weight_mod_on_unsparsed_test} that the $F_1$ score is lesser for Ns upto 1000 (which is what we would expect given it no more follows the sparsed dataset distribution that our model is trained on). However, we see that the higher weights do decently well till $1500$. Beyond that we see that the best performing weight of $\frac{len(train 0)}{len(train 1)}$ becomes too large for it to do well, and we see the $ \frac{N}{10}$ weight factor does better with the $F_1$ score for test. 
+
+\end{enumerate}
+
+
+\subsubsection{Resampling in the Data Loader: Aalysis of the model performance for different degrees of sparsity for different resampling weights }
+
+\textbf{Structure:} 
+
+For testing the performance, we use two different data sets. One is the original (unsparsed test dataset), the other sparsed data set (where we sample every Nth datapoint). The model is trained and validated on the sparse datasets but we test on the different datasets.
+
+\begin{lstlisting}[language=python, title = Adjusting the weight in the loss function]
+train_set = train0_set + train1_set
+val_set = val0_set + val1_set
+random.shuffle(train_set)
+random.shuffle(val_set)
+len(train_set), len(val_set)
+
+# creating test set
+test_0 = [data for data in mnist_test if data[1] == 0]
+test_1 = [data for data in mnist_test if data[1] == 1]
+test_1 = test_1[:len(test_1) // N] # comment this out for the unsparsed
+test_set = test_0 + test_1
+
+test_loader = DataLoader(test_set, batch_size=64, shuffle=False)
+
+compensation = int(train_0len/ train_1len)
+weight_factors = [1, int(N/10), int(N/2), compensation]
+batch_size = 64
+results = []
+
+for weight_factor in weight_factors:
+    weights = np.array( [1.0 if data[1] == 0 
+    else weight_factor for data in train_set])
+    weights = torch.from_numpy(weights)
+    sampler = WeightedRandomSampler(weights, num_samples=len(weights), 
+    replacement=True)
+    train_loader = DataLoader(train_set, batch_size=64, sampler=sampler)
+    val_loader = DataLoader(val_set, batch_size=64, shuffle=False)
+\end{lstlisting}
+
+Note no shuffling in the false, this was inspired from \cite{No Shuffle}
+
+In the table, the $Weight$ means how much more the sparse class (\textbf{1}) was over weighted in the loss function in comparsion to $0$. For each of the $N$, four different weights were tried:
+$\left[1, \frac{N}{10}, \frac{N}{2}, \frac{len(train 0)}{len(train 1)}\right]$
+
+\begin{enumerate}
+    \item {Performance on sparsed test data}
+    
+    \begin{figure}[H]
+        \includegraphics[scale=.7]{plots/resampling_on_sparsted_test.png}
+        \caption{Adjusted Class weights in the  Loss Function, test: sparsted data where N shows every Nth data point from the train, validation, and test datasets were sampled}
+        \label{resampling_sparsed_test}
+    \end{figure}
+
+    \item {Performance on original/unsparsed test data}
+    \begin{figure}[H]
+        \includegraphics[scale=.7]{plots/resampling_on_unsparsed_test}
+        \caption{Adjusted Class weights in the  Loss Function, test: sparsted data where N shows every Nth data point from the train, validation. Test datasets was left as original test data set}
+        \label{resampling_unsparsed_test}
+    \end{figure}
+
+    \item {Observations}
+    
+    Across both the sparsed and the unsparsed dataset we see huge improvements in the $F_1$ scores for the validation dataset over no modifications, which shows that the resampling works well. We note that resampling for lower weights does better that adjusting weights in the loss.
+
+    We also note that in  Fig~\ref{resampling_sparsed_test}, higher weights of for the sparse classes do decently well for $N=1000$. They suffer the same problem for $N>1000$ because the test set has no $1s$. However, over the weight adjustment for the loss function, we do not see a huge difference in the performance.
+
+    However, we do see a decent difference in the performance in resampling over loss weighting for large Ns in Fig~\ref{resampling_unsparsed_test}. $N=1750$ offers a good comparison where we see the validation $F_1$ of 1 and test $F_1$ of around $.97$ for a factor of $\frac{len(train 0)}{len(train 1)}$, whereas we had a test validation of $~.80$ in the case of loss weighting. However, see that the validation score was very low for unsparsed split of $N=2000$, it might be that the validation set did not have a $1$ class. 
+
+    However, see still see that the $F_1 (test)$ for $N=2000$ is still considerably good at $.94$.
+
+
+\textbf{Remark:}
+We note that both weighting in the loss function and resampling in the Data loader offer considerable improvement over no modificaiton in the case of both original and sparsed test data sets. However, we see that the performance of a weighting factor in the data loader through resampling is a lot more consistent across different Ns than the weighting factor in the loss function. In the loss fuction, weighting the highest weights start off well, but we see that their performance drops off for large Ns. The intermediate weighting factors of $\frac{N}{2}, \frac{N}{10}$ start to perform better for more sparse data. 
+
+This makes sense given that weighting the loss by a very large number can make the optimization unstable as we weight a specific class a lot more in the optimization. On the other hand, resampling offers a smoother alternative to weighting the loss function, especially as the sparsity grows too large.
+
+\end{enumerate}
+
+
+\end{solve}

@@ -15,19 +15,17 @@
 \usepackage[margin=.75in]{geometry}
 \usepackage{amsmath, amsfonts}
 \usepackage{enumerate}
-\usepackage[table]{xcolor}
 \usepackage{graphicx}
 \usepackage{titling}
 \usepackage{url}
 \usepackage{xfrac}
-\usepackage{titling}
 \usepackage{natbib}
 \usepackage{amssymb}
 \usepackage{amsthm, mathrsfs}
 \usepackage{paralist}
 \usepackage{epstopdf}
 \usepackage{tabularx}
-\usepackage{longtable}
+% \usepackage{longtable}
 \usepackage{multirow}
 \usepackage{multicol}
 \usepackage[colorlinks=true,urlcolor=blue]{hyperref}
@@ -48,7 +46,7 @@
 \usepackage{comment}
 % \usepackage{minted}
 \usepackage{color}
-\usepackage[dvipsnames]{xcolor}
+\usepackage[table]{xcolor}
 \usepackage[final]{listings}
 \usepackage{tikz}
 \usepackage{framed}
@@ -83,9 +81,9 @@
 \captionsetup{font=bf} % Makes all caption text bold
 
 % \usepackage{tgpagella} % best so far 
-\usepackage{tgcursor}[qcr]
+% \usepackage{tgcursor}[qcr]
 \usepackage[euler-digits]{eulervm}
-% \usepackage{eulervm}
+% \usepackage[OT1]{eulervm}
 
 \usepackage[english]{babel}
 
@@ -294,7 +292,6 @@
 
 
 % Define colors
-\rowcolor{yellow!50}
 \definecolor{Code}{rgb}{0,0,0}
 \definecolor{Keywords}{rgb}{1,0,0}
 \definecolor{Comments}{rgb}{0,0.6,0}
@@ -316,22 +313,22 @@
     showstringspaces=false,
     backgroundcolor=\color{Background}
 }
-\title{18-786 \\Homework 1}
-\author{}
-\date{\today}
-% \day{\today}
+
 \begin{document}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\maketitle
+
+\clearpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{Q1}
-\newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
 \input{Q2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
+\input{Q3}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% \input{Q3}
-% \newpage
+\newpage
+\input{Q4}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
 % \input{temp}
 \end{document}

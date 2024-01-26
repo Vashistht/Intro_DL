@@ -6,7 +6,7 @@
     
     \item Experiment with different numbers of neurons in the hidden layer and note any changes in performance.
     
-    \item Write a brief analysis of the model’s performance, including any challenges faced and how they were addressed
+    \item Write a brief analysis of the model's performance, including any challenges faced and how they were addressed
 \end{itemize}
 
 \begin{solve}
@@ -19,7 +19,7 @@ hidden_dim = int(np.sqrt(28*28*10)) # changed in hyperopt
 
 MulticlassMLP(
     (fc1): Linear(in_features=784, out_features=88, bias=True)
-    (activation): Sigmoid()
+    (activation): Sigmoid() 
     (fc2): Linear(in_features=88, out_features=10, bias=True)
 )
 
@@ -30,15 +30,14 @@ MulticlassMLP(
 
     \subsection{Hyper parameter optimization for Multi-Class Optimization}
     
-    I first experimented with device to see the most optimal device for training between cpu and the gpu on my Mac-M1 Pro. The results are given in the appendix for the model with sigmoid. For each of them we found that \textbf{device = 'cpu'} was faster than  \textbf{device = 'mps'} (mac gpu in M1 Pro).
+    I first experimented with device to see the most optimal device for training between cpu and the gpu on my Mac-M1 Pro. The results are given in the appendix for the model with sigmoid. For each of them we found that \textbf{device = `cpu'} was faster than  \textbf{device = `mps'} (mac gpu in M1 Pro).
 
     \subsubsection{Results:}
-    Two models were optimized for this task, one with sigmoid activiation and the other with ReLU activation.
+    Two models were optimized for this task, one with sigmoid activation and the other with ReLU activation.
 
     \begin{enumerate}
         \item \textbf{Sigmoid Activation Layer}
-        
-        \begin{lstlisting}[language=python]
+\begin{lstlisting}[language=python]
 print(model)
 hidden_dim = int(np.sqrt(28*28*10)) 
 # hidden_dim changed in hyperopt later
@@ -164,37 +163,66 @@ class MulticlassMLP(nn.Module):
     \bottomrule
     \end{tabular}
     \caption{Hyperopt results for different optmizers, learning rate, batch size, and hidden dimension of the MulticlassMLP Network with ReLU activation layer}
-    \label{tb:TableHyperoptRelu}
+    \label{TableHyperoptRelu}
 \end{table}
 %%%%%%%%%%%%%%%%%%%%%%%%%
     \end{enumerate}
 
     \subsubsection{Conclusion}
-    From \ref{TableHyperoptSigmoid} and \ref{tb:TableHyperoptRelu}, we see that the highlighted rows.
+    From \ref{TableHyperoptSigmoid} and \ref{TableHyperoptRelu}, we see that the highlighted rows.
 
-    The \textbf{yellow} rows highlight the highest performing hyper-parameters for `adam', highest performing hyper-parameters for `sgd' are highligted in \textbf{orange}, and \textbf{red} highligts the worse performances across the two optimizers.
+    The \textbf{yellow} rows highlight the highest performing hyper-parameters for `adam', highest performing hyper-parameters for `sgd' are highlighted in \textbf{orange}, and \textbf{red} highligts the worse performances across the two optimizers.
 
+    \textbf{Observations: } 
     \begin{itemize}
-        \item  Sigmoid Activation
-        
-        for batch size, optimizer, learning rate, hidden dimension,  
-        64 & adam & 0.001& 128 & 22.682774 & 98.10 & 96.591667 & 96.87
-        
-        We get a train accuracy of 97.19\%, validation accuracy of 96.52\%, and the test accuracy of 96.80\%.
-
 
         \item Sigmoid Activation
         
-        3 & 64 & adam & 0.001& 128 & 22.682774 & 98.10 & 96.591667 & 96.87
+        \begin{itemize}
+            \item 
+            
+            For batch size, optimizer, learning rate, hidden dimension, training time as follows
+            64, adam, 0.00, 128, 22.682, we get a train accuracy of 98.10\%, validation accuracy of 96.59\%, and the test accuracy of 96.87\%. For batch size, optimizer, learning rate, hidden dimension, training time as follows 64, sgd, 0.01, 128, 20.4487, we get a train accuracy of 90.04\%, validation accuracy of  89.85\%, and the test accuracy of 90.69\%.
+            
+            
+            Across this we note that `adam' gets slightly higher test accuracy than `sgd'. We also see that 128 hidden neurons do slightly better across the test set for both optimizers. This highlights that it is better able to not only capture the train data patterns, but also does well with test data. This shows that the given range of 16~64 might not be best suited for our multi class problem. 
+            
+
+            For batch size, optimizer, learning rate, hidden dimension, training time as follows
+            128, adam, 0.001, 128, 20.2816, wget a train accuracy of 97.40\%, validation accuracy of  96.43\%, and the test accuracy of 96.45\%.
+
+            - Here we see that the batch size of 64 does slightly better than the batch size of 128, while also being slightly faster. However, the difference in performance is not statistically enough.
+            
+            - In the red highlighted rows of \ref{TableHyperoptSigmoid}, we see that Hidden dimension of 4 does worst across the board, which makes sense given the number of neurons are much lesser than what we expect to capture the complexity of the 10 class classification problem. 
+        \end{itemize}        
+
+        \item  ReLU Activation
         
-        We get a train accuracy of 98.10\%, validation accuracy of 96.59\%, and the test accuracy of 96.87\%.
+        \begin{itemize}
+            \item For batch size, optimizer, learning rate, hidden dimension, training time as follows  
+            64, adam, 0.00, 128, 22.68, we get a train accuracy of 97.19\%, validation accuracy of 96.52\%, and the test accuracy of 96.80\%.
 
-        \item Sigmoid Activation
+            For batch size, optimizer, learning rate, hidden dimension, training time as follows 64, sgd, 0.01, 128, 23.6713, we get a train accuracy of  93.88\%, validation accuracy of 93.60\%, and the test accuracy of 94.10\%.
+            
+
+            For batch size, optimizer, learning rate, hidden dimension, training time as follows  
+            128, adam, 0.001, 128, 24.154, we get a train accuracy of  97.73\%, validation accuracy of 93.60\%, and the test accuracy of 96.72\%.
+
+            Across this we note that `adam' gets slightly higher test accuracy than `sgd'. We also see that 128 hidden neurons do slightly worse across the test set for both optimizers, but better for training accuracy. This highlights that we might be over fitting on the training dataset for adam. 
+            
+            - We also see that ReLU activation does slightly worse than sigmoid which is not I had expected. This hightlights that there is no universally best performing activation function. However, again the difference is not what we will call statistically significant.
+            
+            - Here we see that the batch size of 64 does slightly better than the batch size of 128, while also being slightly faster. However, the difference in performance is not statistically enough.
+            
+            - In the red highlighted rows of \ref{TableHyperoptRelu}, we see that Hidden dimension of 4 does worst across the board, which makes sense given the number of neurons are much lesser than what we expect to capture the complexity of the 10 class classification problem. 
+
         
-        7 & 64 & sgd & 0.01 & 128 & 23.671364 & 93.885417 & 93.608333 & 94.10
+        \end{itemize}        
 
-        We get a train accuracy of  93.88\%, validation accuracy of 993.60\%, and the test accuracy of 94.10\%.
 
+        \item Challenges: As such there were no specific challenges other than the compute time that this grid based hyper parameter optimization took. To reduce the timing I tested both cpu and gpu times and to my surprise, cpu was significally faster. 
+        After choosing the faster device, the whole process for the given number of hyper parameters took around 15 minutes for each network. So in total around 30 for both sigmoid and relu networks combined together.
+    
     \end{itemize}
 
 \end{solve}
