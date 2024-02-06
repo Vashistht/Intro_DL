@@ -9,7 +9,7 @@ import numpyNN
 
 
 class MLP():
-    def __init__(self, input_dim, output_dim, hidden_neuron_list, activation_list, opt_init, debug = True):
+    def __init__(self, input_dim, output_dim, hidden_neuron_list, activation_list, opt_init, debug = False):
 
         
         self.input_dim = input_dim
@@ -74,12 +74,6 @@ class MLP():
                 self.dLdA = [dLdA] + self.dLdA  
         return dLdA
 
-    # def get_parameters(self):
-    #     params = []
-    #     for layer in self.layers:
-    #         if hasattr(layer, 'parameters'):
-    #             params.extend(layer.parameters) # append gave error trying this
-    #     return params
 
     def summary(self):
         print("Model Summary")
@@ -96,6 +90,19 @@ class MLP():
             total_params += params
         print(f"Total Parameters: {total_params}")
 
+    
+    def copy(self):
+        # Create a new instance of MLP without initializing the parameters.
+        copied_mlp = MLP(self.input_dim, self.output_dim, self.hidden_neuron_list[1:-1], self.activation_list, self.opt_init, self.debug)
+        
+        # Manually copy over the parameters for each layer.
+        for original_layer, copied_layer in zip(self.layers, copied_mlp.layers):
+            if isinstance(original_layer, Linear):
+                copied_layer.W = original_layer.W.copy()
+                copied_layer.b = original_layer.b.copy()
+        
+        return copied_mlp
+    
     # def set_parameters(self, best_params):
     #     param_index = 0  # Index for tracking position in best_params list
     #     for layer in self.layers:
@@ -104,3 +111,10 @@ class MLP():
     #             layer.b = best_params[param_index + 1]['params']
     #             param_index += 2  # Increment by 2 to move to the next set of weights and biases
 
+
+    # def get_parameters(self):
+    #     params = []
+    #     for layer in self.layers:
+    #         if hasattr(layer, 'parameters'):
+    #             params.extend(layer.parameters) # append gave error trying this
+    #     return params

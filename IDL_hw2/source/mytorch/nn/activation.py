@@ -11,6 +11,7 @@ class Activation():
     def backward(self, dLdA):
         raise NotImplementedError
 
+
 class LinearActivation(Activation):
     """Implementation of the Linear Activation."""
     def forward(self, A):

@@ -5,7 +5,7 @@ from mytorch.nn.initialization import Xavier, He
 inspiration: https://pytorch.org/docs/stable/_modules/torch/nn/modules/linear.html#Linear'''
 class Linear:
     
-    def __init__(self, dim_in, dim_out, initialization=None, gain=1.0, debug = True):
+    def __init__(self, dim_in, dim_out, initialization=None, gain=1.0, debug = False):
         self.dim_in = dim_in
         self.dim_out = dim_out
         self.gain = gain
