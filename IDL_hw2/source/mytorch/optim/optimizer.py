@@ -1,110 +1,75 @@
 import numpy as np
-# cite: lecture slide 20 (SGD+momentum)
 
 class SGD:
-    def __init__(self, lr_decay=1, decay_iter=30, lr=0.01, friction=0.9):
-        self.friction = friction
+    def __init__(self, model, lr=0.01, momentum=0.9, lr_decay=1, decay_iter=30):
+        self.model = model
+        self.lr = lr
+        self.momentum = momentum
         self.lr_decay = lr_decay
         self.decay_iter = decay_iter
-        self.lr = lr
-        # Delay the initialization of velocities
-        self.v = None
         self.iteration = 0
-    
-    # def initialize(self, params):
-    #     params = params
-    #     self.iteration = 0
-    #     # Initialize velocities lazily
-
-    def step(self, params):
-        # params = params
-        # Lazy initialization of velocities based on the shape of gradients
-        if self.v is None:
-            self.v = [np.zeros_like(param['grad'], dtype=np.float64) for param in params if param['grad'] is not None]
-            # print(self.iteration, "Initialized v")
         
+        # Pre-initialize velocity terms for each layer's weights and biases
+        self.v_W = [np.zeros_like(layer.W) for layer in model.layers if hasattr(layer, 'W')]
+        self.v_b = [np.zeros_like(layer.b) for layer in model.layers if hasattr(layer, 'b')]
+
+    def step(self):
         self.iteration += 1
         if self.iteration % self.decay_iter == 0:
             self.lr *= self.lr_decay
-        
-        for i, param in enumerate(params):
-            if param['grad'] is not None:
-                # Now safe to update
-                self.v[i] *= self.friction
-                self.v[i] += param['grad']
-                param['params'] -= self.lr * self.v[i]
-                # print(self.iteration, "v")
+            
+        for i, layer in enumerate([l for l in self.model.layers if hasattr(l, 'W')]):
+            # Apply updates with momentum for weights
+            self.v_W[i] = self.momentum * self.v_W[i] + layer.dLdW
+            layer.W -= self.lr * self.v_W[i]
+                
+            # Apply updates with momentum for biases
+            self.v_b[i] = self.momentum * self.v_b[i] + layer.dLdb
+            layer.b -= self.lr * self.v_b[i]
 
-    def zero_grad(self,params):
-        for param in params:
-            if param['grad'] is not None:
-                param['grad'].fill(0.0)
+    def zero_grad(self):
+        for layer in self.model.layers:
+            if hasattr(layer, 'dLdW'):
+                layer.dLdW.fill(0.0)
+            if hasattr(layer, 'dLdb'):
+                layer.dLdb.fill(0.0)
 
-######################################
-'''Taking this from my submission for HW 6, question 3 to Intro to ML (18661)
-- Vashisth Tiwari HW 6'''
+
+###
+'''Took from IML HW 6 and modified it to fit the requirements here'''
 
 class Adam:
-    """Adam (Adaptive Moment) optimizer.
-
-    Parameters
-    ----------
-    learning_rate : float
-        Learning rate multiplier.
-    beta1 : float
-        Momentum decay parameter.
-    beta2 : float
-        Variance decay parameter.
-    epsilon : float
-        A small constant added to the denominator for numerical stability.
-    """
-
-    def __init__(self, lr_decay=1, decay_iter=300, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-7):
-        
-        self.lr_decay = lr_decay
-        self.decay_iter = decay_iter
-        
+    def __init__(self, model, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-7, lr_decay=1, decay_iter=300):
+        self.model = model
         self.learning_rate = learning_rate
         self.beta1 = beta1
         self.beta2 = beta2
         self.epsilon = epsilon
-        self.tstep = 0
-        
-        # Delay the initialization of m and v
-        self.m = None
-        self.v = None
-        # params = None
+        self.lr_decay = lr_decay
+        self.decay_iter = decay_iter
         self.iteration = 0
-    # def initialize(self, params):
-    #     params = params
+        # Pre-initialize first and second moment vectors for weights and biases
+        self.m_W = [np.zeros_like(layer.W) for layer in model.layers if hasattr(layer, 'W')]
+        self.v_W = [np.zeros_like(layer.W) for layer in model.layers if hasattr(layer, 'W')]
+        self.m_b = [np.zeros_like(layer.b) for layer in model.layers if hasattr(layer, 'b')]
+        self.v_b = [np.zeros_like(layer.b) for layer in model.layers if hasattr(layer, 'b')]
 
-
-    def step(self, params):
-        self.tstep += 1
-        if self.tstep % self.decay_iter == 0:
+    def step(self):
+        self.iteration += 1
+        if self.iteration % self.decay_iter == 0:
             self.learning_rate *= self.lr_decay
-       
-       
-        if self.m is None or self.v is None:
-            # Lazy initialization of m and v based on the shape of gradients
-            self.m = [np.zeros_like(param['grad'], dtype=np.float64) for param in params if param['grad'] is not None]
-            self.v = [np.zeros_like(param['grad'], dtype=np.float64) for param in params if param['grad'] is not None]
-
-        for i, param in enumerate(params):
-            if param['grad'] is not None:
-                self.m[i] = self.beta1 * self.m[i] + (1 - self.beta1) * param['grad']
-                self.v[i] = self.beta2 * self.v[i] + (1 - self.beta2) * (param['grad'] ** 2)
-
-                # Correct bias for m and v
-                m_hat = self.m[i] / (1 - self.beta1 ** self.tstep)
-                v_hat = self.v[i] / (1 - self.beta2 ** self.tstep)
-
-                param['params'] -= self.learning_rate * m_hat / (np.sqrt(v_hat) + self.epsilon)
-
-                if self.tstep % self.decay_iter == 0:
-                    self.learning_rate *= self.lr_decay
-    
-    def zero_grad(self, params):
-        for param in params:
-            # if param['grad'] is not None:
-            param['grad'].fill(0.0)
+            
+        for i, layer in enumerate([l for l in self.model.layers if hasattr(l, 'W')]):
+            # Update moments for weights
+            self.m_W[i] = self.beta1 * self.m_W[i] + (1 - self.beta1) * layer.dLdW
+            self.v_W[i] = self.beta2 * self.v_W[i] + (1 - self.beta2) * (layer.dLdW ** 2)
+            m_hat_W = self.m_W[i] / (1 - self.beta1 ** self.iteration)
+            v_hat_W = self.v_W[i] / (1 - self.beta2 ** self.iteration)
+            layer.W -= self.learning_rate * m_hat_W / (np.sqrt(v_hat_W) + self.epsilon)
+            
+            # Update moments for biases
+            self.m_b[i] = self.beta1 * self.m_b[i] + (1 - self.beta1) * layer.dLdb
+            self.v_b[i] = self.beta2 * self.v_b[i] + (1 - self.beta2) * (layer.dLdb ** 2)
+            m_hat_b = self.m_b[i] / (1 - self.beta1 ** self.iteration)
+            v_hat_b = self.v_b[i] / (1 - self.beta2 ** self.iteration)
+            layer.b -= self.learning_rate * m_hat_b / (np.sqrt(v_hat_b) + self.epsilon)

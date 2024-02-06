@@ -14,7 +14,7 @@ class Xavier:
     def __init__(self):
         pass
     
-    def initialize(self, dim_in, dim_out, gain=1.0):
+    def initialize(self, dim_out, dim_in, gain=1.0):
         '''
         Initialize the input tensor with Xavier initialization
         '''
@@ -22,7 +22,7 @@ class Xavier:
         # get dim in, dim out 
         # dim_in, dim_out = tensor.size(0), tensor.size(1)
         bound = gain* np.sqrt(6/(dim_in + dim_out))
-        W = np.random.uniform(-bound, bound, size = (dim_in, dim_out) )
+        W = np.random.uniform(-bound, bound, size = (dim_out,dim_in) )
         return W
     
 
@@ -37,7 +37,7 @@ class He:
     def __init__(self):
         pass
     
-    def initialize(self, dim_in, dim_out, gain=1.0, mode='fan_in'):
+    def initialize(self, dim_out,dim_in,  gain=1.0, mode='fan_in'):
         '''
         Initialize the input tensor with Xavier initialization
         '''
@@ -51,6 +51,6 @@ class He:
         # dim_in, dim_out = tensor.size(0), tensor.size(1)
         mode_dim = (dim_in if mode == 'fan_in' else dim_out)
         bound = gain* np.sqrt(3/ mode_dim)
-        W = np.random.uniform(-bound, bound, size = (dim_in, dim_out) )
+        W = np.random.uniform(-bound, bound, size = (dim_out,dim_in) )
         
         return W
