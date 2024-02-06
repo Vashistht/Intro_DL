@@ -21,7 +21,7 @@ class SGD:
         # Lazy initialization of velocities based on the shape of gradients
         if self.v is None:
             self.v = [np.zeros_like(param['grad'], dtype=np.float64) for param in params if param['grad'] is not None]
-            print(self.iteration, "Initialized v")
+            # print(self.iteration, "Initialized v")
         
         self.iteration += 1
         if self.iteration % self.decay_iter == 0:
@@ -33,7 +33,7 @@ class SGD:
                 self.v[i] *= self.friction
                 self.v[i] += param['grad']
                 param['params'] -= self.lr * self.v[i]
-                print(self.iteration, "v")
+                # print(self.iteration, "v")
 
     def zero_grad(self,params):
         for param in params:

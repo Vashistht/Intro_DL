@@ -1,5 +1,5 @@
 import numpy as np
-from mytorch.nn.activation import ReLU, Softmax, Tanh, LinearActivation
+from mytorch.nn.activation import ReLU, Sigmoid, Tanh, LinearActivation
 from mytorch.nn.initialization import Xavier, He
 from mytorch.nn.linear import Linear
 from mytorch.optim.optimizer import SGD, Adam
@@ -41,8 +41,8 @@ class MLP():
     def _get_activation_fn(self, name):
         if name == 'ReLU':
             return ReLU()
-        elif (name == 'Softmax') or (name == 'Sigmoid'):
-            return Softmax()
+        elif (name == 'Sigmoid'):
+            return Sigmoid()
         elif name == 'Tanh':
             return Tanh()
         elif name == 'LinearActivation':

@@ -19,8 +19,8 @@ class Linear:
             self.W = np.random.randn(dim_in, dim_out)
         
         self.b = np.zeros((1, self.dim_out))
-        self.dLdW = None
-        self.dLdb = None
+        self.dLdW = 0.0
+        self.dLdb = 0.0
         
     def forward(self, input):
         # input shape (batch, dim_in)

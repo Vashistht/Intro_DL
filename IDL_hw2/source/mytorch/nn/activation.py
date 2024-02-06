@@ -35,8 +35,8 @@ class LinearActivation(Activation):
         self.x = x
         return x
 
-    def backward(self, x):
-        """Derivative of the sigmoid activation function.
+    def backward(self,dA):
+        """Derivative of the linear activation function.
         Parameters
         ----------
         x : np.array
@@ -46,7 +46,7 @@ class LinearActivation(Activation):
         np.array
             Output of the derivative of the sigmoid activation function.
         """
-        return np.ones(x.shape)
+        return dA* np.ones(self.x.shape)
     
 ###
 
@@ -69,8 +69,8 @@ class ReLU(Activation):
         self.x = x
         return np.maximum(0, x)
 
-    def backward(self, x):
-        """Derivative of the sigmoid activation function.
+    def backward(self, dA):
+        """Derivative of the ReLU activation function.
         Parameters
         ----------
         x : np.array
@@ -80,7 +80,7 @@ class ReLU(Activation):
         np.array
             Output of the derivative of the sigmoid activation function.
         """
-        return np.where(x > 0, 1, 0)
+        return np.where(self.x > 0, 1, 0)
 
 
 ###
@@ -93,35 +93,36 @@ Here we implement the activations, their derivatives for forward and backward pa
 import numpy as np
 
 ###
-class Softmax(Activation):
+class Sigmoid(Activation):
     
     def forward(self, x, train=True):
-        """Forward propogation through softmax.
+        """Forward propagation through the sigmoid activation function.
         Parameters
         ----------
         x : np.array
-            Input for this activation function, x_{k-1}.
+            Input for this activation function.
         Returns
         -------
         np.array
-            Output of this activation function x_k = f_k(., x_{k-1}).
+            Output of the sigmoid activation function.
         """
         self.x = x
-        exps = np.exp(x - np.max(x, axis=1, keepdims=True))
-        return exps / np.sum(exps, axis=1, keepdims=True)
+        return 1 / (1 + np.exp(-x))
 
-    def backward(self, x):
-        """Derivative of the sigmoid activation function.
+    def backward(self, dA):
+        """Derivative of the sigmoid activation function with respect to the input x.
         Parameters
         ----------
-        x : np.array
-            Input for this activation function, x_{k-1}.
+        dA : np.array
+            The gradient of the loss with respect to the output of the sigmoid function.
         Returns
         -------
         np.array
-            Output of the derivative of the sigmoid activation function.
+            Gradient of the loss with respect to the input of the sigmoid function.
         """
-        return x * (1 - x)
+        sigmoid = 1 / (1 + np.exp(-self.x))
+        return dA * sigmoid * (1 - sigmoid)
+
 
 import numpy as np
 
@@ -147,8 +148,8 @@ class Tanh(Activation):
         self.x = x
         return np.tanh(x)
 
-    def backward(self, x):
-        """Derivative of the sigmoid activation function.
+    def backward(self, dA):
+        """Derivative of the Tanh activation function.
         Parameters
         ----------
         x : np.array
@@ -158,5 +159,5 @@ class Tanh(Activation):
         np.array
             Output of the derivative of the sigmoid activation function.
         """
-        return 1 - np.tanh(x)**2
+        return dA* (1 - np.tanh(self.x)**2)
 
