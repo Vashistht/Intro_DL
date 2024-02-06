@@ -10,6 +10,7 @@ import numpy as np
 
 
 
+
 class Xavier:
     def __init__(self):
         pass
@@ -52,5 +53,6 @@ class He:
         mode_dim = (dim_in if mode == 'fan_in' else dim_out)
         bound = gain* np.sqrt(3/ mode_dim)
         W = np.random.uniform(-bound, bound, size = (dim_in, dim_out) )
+        
         
         return W
