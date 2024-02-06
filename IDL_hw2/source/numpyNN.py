@@ -130,6 +130,26 @@ def plot_loss(logs):
 	plt.ylabel('loss value',fontsize=15)
 	plt.legend(fontsize=15)
 
+
+
+def plot_accuracy(logs):
+	"""
+	Function to plot training and validation/test loss curves
+	:param logs: dict with keys 'train_accuracy','test_accuracy' and 'epochs', where train_accuracy and test_accuracy are lists with 
+				the training and test/validation loss for each epoch
+	"""
+	plt.figure(figsize=(20, 8))
+	plt.subplot(1, 2, 1)
+	t = np.arange(len(logs['train_accuracy']))
+	plt.plot(t, logs['train_accuracy'], label='train_accuracy', lw=3)
+	plt.plot(t, logs['test_accuracy'], label='test_accuracy', lw=3)
+	plt.grid(1)
+	plt.xlabel('epochs',fontsize=15)
+	plt.ylabel('accuracy',fontsize=15)
+	plt.legend(fontsize=15)
+
+
+
 def plot_decision_boundary(X, y, pred_fn, boundry_level=None):
     """
     Plots the decision boundary for the model prediction

@@ -7,10 +7,6 @@ from mytorch.optim.optimizer import SGD, Adam
 import numpyNN
 
 
-# mlp = initialize_mlp ( num_layers , num_width , opt_act , opt_init )
-# train_mlp ( mlp , training_data , num_epoch , opt_loss , opt_optim )
-# test_mlp ( mlp , test_data , opt_loss )
-
 
 class MLP():
     def __init__(self, input_dim, output_dim, hidden_neuron_list, activation_list, opt_init):

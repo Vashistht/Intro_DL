@@ -10,15 +10,17 @@ class SGD:
         # Delay the initialization of velocities
         self.v = None
     
-    def initialize(self, params):
-        self.params = params
-        self.iteration = 0
-        # Initialize velocities lazily
+    # def initialize(self, params):
+    #     self.params = params
+    #     self.iteration = 0
+    #     # Initialize velocities lazily
 
-    def step(self):
+    def step(self, params):
+        # self.params = params
         # Lazy initialization of velocities based on the shape of gradients
         if self.v is None:
             self.v = [np.zeros_like(param['grad']) for param in self.params if param['grad'] is not None]
+            print(self.iteration, "Initialized v")
         
         self.iteration += 1
         if self.iteration % self.decay_iter == 0:
@@ -30,6 +32,7 @@ class SGD:
                 self.v[i] *= self.friction
                 self.v[i] += param['grad']
                 param['params'] -= self.lr * self.v[i]
+                print(self.iteration, "v")
 
     def zero_grad(self):
         for param in self.params:
@@ -71,11 +74,11 @@ class Adam:
         self.v = None
         self.params = None
         
-    def initialize(self, params):
-        self.params = params
+    # def initialize(self, params):
+    #     self.params = params
 
 
-    def step(self):
+    def step(self, params):
         self.tstep += 1
         if self.tstep % self.decay_iter == 0:
             self.learning_rate *= self.lr_decay
