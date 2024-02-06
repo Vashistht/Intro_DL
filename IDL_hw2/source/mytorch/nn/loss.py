@@ -1,7 +1,20 @@
 import numpy as np
 
 
-class CrossEntropyLoss:
+class Criterion():
+        def __init__(self) -> None:
+            pass
+        
+        def forward(self, pred, labels, epsilon=1e-6):
+            raise NotImplementedError
+        
+        def backward(self, pred, labels, epsilon=1e-6):
+            raise NotImplementedError
+
+
+
+
+class CrossEntropyLoss(Criterion):
     
     def forward(self, pred, labels, epsilon=1e-6):
         """Forward pass for cross entropy loss.
@@ -46,7 +59,7 @@ class CrossEntropyLoss:
 
 
 
-class L2Loss:
+class L2Loss(Criterion):
     
     def forward(self, pred, labels, epsilon=1e-6):
         """Forward pass for L2 loss (mean squared error).
@@ -65,7 +78,7 @@ class L2Loss:
         """
         assert(np.shape(pred) == np.shape(labels))
         l2_loss = np.sum((pred - labels)**2, axis=1)
-        l2_loss /= ( pred.shape[0] * pred.shape[1])        
+        l2_loss /= ( pred.shape[0] )        #* pred.shape[1]
         
         return l2_loss
     
@@ -86,6 +99,6 @@ class L2Loss:
         """
         assert(np.shape(pred) == np.shape(labels))
         l2_loss_backward = 2* (pred-labels)
-        l2_loss_backward /= ( labels.shape[0] * labels.shape[1])
+        l2_loss_backward /= ( labels.shape[0] ) #* labels.shape[1]
         return l2_loss_backward
     

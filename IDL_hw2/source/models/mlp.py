@@ -1,10 +1,8 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from mytorch.nn.activation import ReLU, Softmax, Tanh, LinearActivation
 from mytorch.nn.initialization import Xavier, He
-from mytorch.nn.loss import CrossEntropyLoss, L2Loss
-from mytorch.optim import SGD, Adam
-from mytorch.nn import Linear
+from mytorch.nn.linear import Linear
+from mytorch.optim.optimizer import SGD, Adam
 # imports from given file
 import numpyNN
 
@@ -13,47 +11,36 @@ import numpyNN
 # train_mlp ( mlp , training_data , num_epoch , opt_loss , opt_optim )
 # test_mlp ( mlp , test_data , opt_loss )
 
-# class MLP:
-#     def __init__(self, num_layers, node_list, opt_list, opt_init):
-        
-#         self.num_layers = num_layers
-#         self.node_list = node_list
-#         self.opt_list = opt_list
-#         self.opt_init = opt_init
-        
-#         self.layers = []
-        
-#         for i in range(self.num_layers):
-#             if i == 0:
-#                 self.layers.append(Linear(node_list[i], node_list[i+1], initialization=opt_init))
-#             else:
-#                 self.layers.append(Linear(node_list[i], node_list[i+1], initialization=opt_init))
-#                 self.layers.append(opt_list[i-1])
 
+class MLP():
+    def __init__(self, input_dim, output_dim, hidden_neuron_list, activation_list, opt_init):
 
-class MLP:
-    def __init__(self, node_list, activation_list, opt_init):
-        # assert len(node_list) - 1 == len(activation_list), "node_list must be one more than activation_list"
         
-        self.node_list = node_list
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        
+        self.hidden_neuron_list = [self.input_dim] + hidden_neuron_list + [self.output_dim] 
         self.activation_list = activation_list
         self.opt_init = opt_init
         
         self.layers = self._build_layers()
-    
+        
+        # assert len(self.layers) - 1 == len(activation_list), "layer list must be one more than activation_list"
+        
     def _build_layers(self):
         layers = []
-        for i in range(len(self.node_list) - 1):
+        for i in range(len(self.hidden_neuron_list) - 1):
             # Add Linear layer
-            linear_layer = Linear(self.node_list[i], self.node_list[i+1], initialization=self.opt_init)
+            linear_layer = Linear(self.hidden_neuron_list[i], self.hidden_neuron_list[i+1], initialization=self.opt_init)
             layers.append(linear_layer)
             
             # Add activation layer based on activation_list
             activation_fn = self._get_activation_fn(self.activation_list[i])
             layers.append(activation_fn)
-            
+        # print(layers)
         return layers
 
+    
 
     def _get_activation_fn(self, name):
         if name == 'ReLU':
@@ -79,3 +66,25 @@ class MLP:
         for i in reversed(range(no_layers)):
             dLdA = self.layers[i].backward(dLdA)
         return dLdA
+
+    def get_parameters(self):
+        params = []
+        for layer in self.layers:
+            if hasattr(layer, 'parameters'):
+                params.extend(layer.parameters) # append gave error trying this
+        return params
+
+    def summary(self):
+        print("Model Summary")
+        print("-------------")
+        total_params = 0
+        for i, layer in enumerate(self.layers):
+            layer_type = "Linear" if isinstance(layer, Linear) else type(layer).__name__
+            if isinstance(layer, Linear):
+                params = layer.dim_in * layer.dim_out + layer.dim_out  # weights + biases
+                print(f"Layer {i+1}: {layer_type} - Input Dim: {layer.dim_in}, Output Dim: {layer.dim_out}, Parameters: {params}")
+            else:
+                print(f"Layer {i+1}: {layer_type}")
+                params = 0
+            total_params += params
+        print(f"Total Parameters: {total_params}")
