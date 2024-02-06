@@ -9,24 +9,25 @@ class SGD:
         self.lr = lr
         # Delay the initialization of velocities
         self.v = None
+        self.iteration = 0
     
     # def initialize(self, params):
-    #     self.params = params
+    #     params = params
     #     self.iteration = 0
     #     # Initialize velocities lazily
 
     def step(self, params):
-        # self.params = params
+        # params = params
         # Lazy initialization of velocities based on the shape of gradients
         if self.v is None:
-            self.v = [np.zeros_like(param['grad']) for param in self.params if param['grad'] is not None]
+            self.v = [np.zeros_like(param['grad'], dtype=np.float64) for param in params if param['grad'] is not None]
             print(self.iteration, "Initialized v")
         
         self.iteration += 1
         if self.iteration % self.decay_iter == 0:
             self.lr *= self.lr_decay
         
-        for i, param in enumerate(self.params):
+        for i, param in enumerate(params):
             if param['grad'] is not None:
                 # Now safe to update
                 self.v[i] *= self.friction
@@ -34,10 +35,10 @@ class SGD:
                 param['params'] -= self.lr * self.v[i]
                 print(self.iteration, "v")
 
-    def zero_grad(self):
-        for param in self.params:
+    def zero_grad(self,params):
+        for param in params:
             if param['grad'] is not None:
-                param['grad'].fill(0)
+                param['grad'].fill(0.0)
 
 ######################################
 '''Taking this from my submission for HW 6, question 3 to Intro to ML (18661)
@@ -72,10 +73,10 @@ class Adam:
         # Delay the initialization of m and v
         self.m = None
         self.v = None
-        self.params = None
-        
+        # params = None
+        self.iteration = 0
     # def initialize(self, params):
-    #     self.params = params
+    #     params = params
 
 
     def step(self, params):
@@ -86,10 +87,10 @@ class Adam:
        
         if self.m is None or self.v is None:
             # Lazy initialization of m and v based on the shape of gradients
-            self.m = [np.zeros_like(param['grad']) for param in self.params if param['grad'] is not None]
-            self.v = [np.zeros_like(param['grad']) for param in self.params if param['grad'] is not None]
+            self.m = [np.zeros_like(param['grad'], dtype=np.float64) for param in params if param['grad'] is not None]
+            self.v = [np.zeros_like(param['grad'], dtype=np.float64) for param in params if param['grad'] is not None]
 
-        for i, param in enumerate(self.params):
+        for i, param in enumerate(params):
             if param['grad'] is not None:
                 self.m[i] = self.beta1 * self.m[i] + (1 - self.beta1) * param['grad']
                 self.v[i] = self.beta2 * self.v[i] + (1 - self.beta2) * (param['grad'] ** 2)
@@ -103,7 +104,7 @@ class Adam:
                 if self.tstep % self.decay_iter == 0:
                     self.learning_rate *= self.lr_decay
     
-    def zero_grad(self):
-        for param in self.params:
+    def zero_grad(self, params):
+        for param in params:
             # if param['grad'] is not None:
-            param['grad'].fill(0)
+            param['grad'].fill(0.0)

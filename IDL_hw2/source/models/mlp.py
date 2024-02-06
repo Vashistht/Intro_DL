@@ -84,3 +84,12 @@ class MLP():
                 params = 0
             total_params += params
         print(f"Total Parameters: {total_params}")
+
+    def set_parameters(self, best_params):
+        param_index = 0  # Index for tracking position in best_params list
+        for layer in self.layers:
+            if isinstance(layer, Linear):  # Only linear layers have parameters
+                layer.W = best_params[param_index]['params']
+                layer.b = best_params[param_index + 1]['params']
+                param_index += 2  # Increment by 2 to move to the next set of weights and biases
+
