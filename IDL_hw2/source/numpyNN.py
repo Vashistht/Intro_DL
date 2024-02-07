@@ -120,14 +120,17 @@ def plot_loss(logs):
 	:param logs: dict with keys 'train_loss','test_loss' and 'epochs', where train_loss and test_loss are lists with 
 				the training and test/validation loss for each epoch
 	"""
-	plt.figure(figsize=(20, 8))
-	plt.subplot(1, 2, 1)
+	# plt.subplot(1, 2, 1)
 	t = np.arange(len(logs['train_loss']))
-	plt.plot(t, logs['train_loss'], label='train_loss', lw=3)
-	plt.plot(t, logs['test_loss'], label='test_loss', lw=3)
+	plt.plot(t, logs['train_loss'], label='train loss', lw=3)
+	plt.plot(t, logs['test_loss'], label='test loss', lw=3)
+	min_train_loss = min(logs['train_loss'])
+	min_test_loss = min(logs['test_loss'])
+	
+	plt.title(f"Loss Curves (Min Train Loss: {min_train_loss:.3f}, Min Test Loss: {min_test_loss:.3f})", fontsize = 16)
 	plt.grid(1)
-	plt.xlabel('epochs',fontsize=15)
-	plt.ylabel('loss value',fontsize=15)
+	plt.xlabel('Epochs',fontsize=15)
+	plt.ylabel('Loss',fontsize=15)
 	plt.legend(fontsize=15)
 
 
@@ -138,36 +141,80 @@ def plot_accuracy(logs):
 	:param logs: dict with keys 'train_accuracy','test_accuracy' and 'epochs', where train_accuracy and test_accuracy are lists with 
 				the training and test/validation loss for each epoch
 	"""
-	plt.figure(figsize=(20, 8))
-	plt.subplot(1, 2, 1)
+	# plt.subplot(1, 2, 1)
 	t = np.arange(len(logs['train_accuracy']))
 	plt.plot(t, logs['train_accuracy'], label='train_accuracy', lw=3)
 	plt.plot(t, logs['test_accuracy'], label='test_accuracy', lw=3)
+ 
+	max_train_accuracy = max(logs['train_accuracy'])
+	max_test_accuracy = max(logs['test_accuracy'])
+	plt.title(f"Accuracy Curves (Max Train Acc.: {max_train_accuracy:.3f}, Max Test Acc.: {max_test_accuracy:.3f})", fontsize= 16)
 	plt.grid(1)
-	plt.xlabel('epochs',fontsize=15)
-	plt.ylabel('accuracy',fontsize=15)
+	plt.xlabel('Epochs',fontsize=15)
+	plt.ylabel('Accuracy',fontsize=15)
 	plt.legend(fontsize=15)
 
 
 
-def plot_decision_boundary(X, y, pred_fn, boundry_level=None):
+
+def plot_decision_boundary(X, y, model, boundry_level=None):
     """
     Plots the decision boundary for the model prediction
     :param X: input data
     :param y: true labels
-    :param pred_fn: prediction function,  which use the current model to predict。. i.e. y_pred = pred_fn(X)
+    :param model: your MLP model
     :boundry_level: Determines the number and positions of the contour lines / regions.
     :return:
-    """
-    
+    # """
+    # print(X.shape)
+    # print(y.shape)
     x_min, x_max = X[:, 0].min() - 0.1, X[:, 0].max() + 0.1
     y_min, y_max = X[:, 1].min() - 0.1, X[:, 1].max() + 0.1
     xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.01),
                          np.arange(y_min, y_max, 0.01))
+    def predict(X): # added this to work with my mlp
+        y_pred = model.forward(X)
+        return np.argmax(y_pred, axis=1)
 
-    Z = pred_fn(np.c_[xx.ravel(), yy.ravel()])
+
+    # Use the predict function as pred_fn
+    Z = predict(np.c_[xx.ravel(), yy.ravel()])
     Z = Z.reshape(xx.shape)
     plt.contourf(xx, yy, Z, alpha=0.7, levels=boundry_level, cmap='viridis_r')
     plt.xlim(xx.min(), xx.max())
     plt.ylim(yy.min(), yy.max())
-    plt.scatter(X[:, 0], X[:, 1], c=y.reshape(-1), alpha=0.7,s=50, cmap='viridis_r',)
+    plt.scatter(X[:, 0], X[:, 1], c=y.reshape(-1), alpha=0.7,s=50, cmap='viridis_r', edgecolor='k')
+
+
+
+def plot_stats (logs, model, x_train, y_train, x_test, y_test, fig1_name, fig2_name):
+	directory = '/Users/vashisth/Documents/GitHub/Intro_DL/IDL_hw2/source/plots/'
+	fig1_name = directory+ fig1_name
+	fig2_name = directory+ fig2_name
+	epochs = len(logs['train_loss'])
+	plt.figure(figsize=(20, 8))
+	plt.subplot(1, 2, 1)
+	# plt.title("Loss Curves")
+	plot_loss(logs)
+	# test set
+	plt.subplot(1, 2, 2)
+	# plt.title("Accuracy Curves")
+	plot_accuracy(logs)
+	plt.suptitle(f'Loss-Accuracy Plots (for {epochs} epochs)', fontsize=20)
+	plt.tight_layout()
+	plt.savefig(fig1_name, dpi=300)
+	# train set
+
+
+
+	plt.figure(figsize=(20, 8))
+	plt.subplot(1, 2, 1)
+	plt.title("Train Set Decision Boundary", fontsize = 16)
+	plot_decision_boundary(x_train, y_train, model , boundry_level=None)
+	# test set
+	plt.subplot(1, 2, 2)
+	plt.title("Test Set Decision Boundary",fontsize = 16)
+	plot_decision_boundary(x_test, y_test, model , boundry_level=None)
+	plt.suptitle('Decision Boundary Plots', fontsize=20)
+	plt.tight_layout()
+	plt.savefig(fig2_name, dpi=300)
