@@ -21,6 +21,7 @@
 \usepackage{xfrac}
 \usepackage{natbib}
 \usepackage{amssymb}
+\usepackage[export]{adjustbox}
 \usepackage{amsthm, mathrsfs}
 \usepackage{paralist}
 \usepackage{epstopdf}
@@ -98,7 +99,7 @@
 % enhanced breakable to break the tcolorbox over pages
 \newenvironment{solve}{%
   \ifthenelse{\boolean{solve}}{%
-    \begin{tcolorbox}[enhanced, breakable, colframe=purple, colback=white, coltext = black]
+    \begin{tcolorbox}[enhanced, breakable, colframe=black, colback=white, coltext = black]
     \noindent \underline{\textbf{Solution:}}
     }{%
   }%
@@ -290,6 +291,7 @@
 
 \newcommand{\comebacktoit}[1]{\textbf{\textcolor{red}{\Large #1}} }
 
+\renewcommand{\path}{/Users/vashisth/Documents/GitHub/Intro_DL/IDL_hw2/source/plots/}
 
 % Define colors
 \definecolor{Code}{rgb}{0,0,0}
