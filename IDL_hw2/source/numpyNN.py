@@ -114,7 +114,7 @@ def sample_data(data_name='circle', nTrain=200, nTest=200, random_seed=0,):
 	return x_train, y_train, x_test, y_test
 
 
-def plot_loss(logs):
+def plot_loss(logs,savefig = False, figname = None):
 	"""
 	Function to plot training and validation/test loss curves
 	:param logs: dict with keys 'train_loss','test_loss' and 'epochs', where train_loss and test_loss are lists with 
@@ -127,11 +127,15 @@ def plot_loss(logs):
 	min_train_loss = min(logs['train_loss'])
 	min_test_loss = min(logs['test_loss'])
 	
-	plt.title(f"Loss Curves (Min Train Loss: {min_train_loss:.3f}, Min Test Loss: {min_test_loss:.3f})", fontsize = 16)
+	plt.title(f"Loss Curves (Min Train Loss: {min_train_loss:.4f}, Min Test Loss: {min_test_loss:.4f})", fontsize = 16)
 	plt.grid(1)
 	plt.xlabel('Epochs',fontsize=15)
 	plt.ylabel('Loss',fontsize=15)
 	plt.legend(fontsize=15)
+	if savefig:
+		directory = '/Users/vashisth/Documents/GitHub/Intro_DL/IDL_hw2/source/plots/'
+		figname = directory+ figname + '.png'
+		plt.savefig(figname, dpi=300)
 
 
 
@@ -147,8 +151,8 @@ def plot_accuracy(logs):
 	plt.plot(t, logs['test_accuracy'], label='test_accuracy', lw=3)
  
 	max_train_accuracy = max(logs['train_accuracy'])
-	max_test_accuracy = max(logs['test_accuracy'])
-	plt.title(f"Accuracy Curves (Max Train Acc.: {max_train_accuracy:.3f}, Max Test Acc.: {max_test_accuracy:.3f})", fontsize= 16)
+	max_test_accuracy = logs['test_accuracy'][np.argmax(logs['train_accuracy'])]
+	plt.title(f"Accuracy Curves (Max Train Acc.: {max_train_accuracy:.4f}, Test Acc.: {max_test_accuracy:.4f})", fontsize= 16)
 	plt.grid(1)
 	plt.xlabel('Epochs',fontsize=15)
 	plt.ylabel('Accuracy',fontsize=15)
@@ -186,11 +190,44 @@ def plot_decision_boundary(X, y, model, boundry_level=None):
     plt.scatter(X[:, 0], X[:, 1], c=y.reshape(-1), alpha=0.7,s=50, cmap='viridis_r', edgecolor='k')
 
 
+def plot_train_test_data(x_train, y_train, x_test, y_test, figname):
+    # Flatten y_train to a 1D array for boolean indexing
+	y_train_flat = y_train.flatten()
+	y_test_flat = y_test.flatten()
+ 
+	# Now, separate x_train data points
+	x_train_0 = x_train[y_train_flat == 0]
+	x_train_1 = x_train[y_train_flat == 1]
+	x_test_0 = x_test[y_test_flat == 0]
+	x_test_1 = x_test[y_test_flat == 1]
+ 
+	plt.figure(figsize=(20, 8))
+	plt.subplot(1, 2, 1)
+	plt.scatter(x_train_0[:, 0], x_train_0[:, 1], c='red', label='0')
+	plt.scatter(x_train_1[:, 0], x_train_1[:, 1], c='blue', label=' 1')
+	plt.xlabel('Feature 1')
+	plt.ylabel('Feature 2')
+	plt.title('Training Data')
+	plt.legend()
+	plt.subplot(1, 2, 2)
+	plt.scatter(x_test_0[:, 0], x_test_0[:, 1], c='red', label='0')
+	plt.scatter(x_test_1[:, 0], x_test_1[:, 1], c='blue', label=' 1')
+	plt.xlabel('Feature 1')
+	plt.ylabel('Feature 2')
+	plt.title('Test Data')
+	plt.suptitle('Train-Test Data', fontsize=20)
+	plt.tight_layout()
+	plt.legend()
+	directory = '/Users/vashisth/Documents/GitHub/Intro_DL/IDL_hw2/source/plots/'
+	figname = directory+ 'train_test_'+ figname + '.png'
+	plt.savefig(figname, dpi=300)
+	plt.show()
+
 
 def plot_stats (logs, model, x_train, y_train, x_test, y_test, fig1_name, fig2_name):
 	directory = '/Users/vashisth/Documents/GitHub/Intro_DL/IDL_hw2/source/plots/'
-	fig1_name = directory+ fig1_name
-	fig2_name = directory+ fig2_name
+	fig1_name = directory+ fig1_name + 'loss_acc.png'
+	fig2_name = directory+ fig2_name + 'boundary.png'
 	epochs = len(logs['train_loss'])
 	plt.figure(figsize=(20, 8))
 	plt.subplot(1, 2, 1)

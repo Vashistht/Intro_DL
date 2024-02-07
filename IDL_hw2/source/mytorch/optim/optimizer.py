@@ -1,7 +1,7 @@
 import numpy as np
 
 class SGD:
-    def __init__(self, model, lr=0.01, momentum=0.9, lr_decay=1, decay_iter=30):
+    def __init__(self, model, lr=0.01, momentum=1, lr_decay=1, decay_iter=100):
         self.model = model
         self.lr = lr
         self.momentum = momentum
@@ -39,7 +39,7 @@ class SGD:
 '''Took from IML HW 6 and modified it to fit the requirements here'''
 
 class Adam:
-    def __init__(self, model, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-7, lr_decay=1, decay_iter=300):
+    def __init__(self, model, learning_rate=0.001, beta1=0.9, beta2=0.999, epsilon=1e-7, lr_decay=1, decay_iter=100):
         self.model = model
         self.learning_rate = learning_rate
         self.beta1 = beta1
@@ -73,3 +73,10 @@ class Adam:
             m_hat_b = self.m_b[i] / (1 - self.beta1 ** self.iteration)
             v_hat_b = self.v_b[i] / (1 - self.beta2 ** self.iteration)
             layer.b -= self.learning_rate * m_hat_b / (np.sqrt(v_hat_b) + self.epsilon)
+    
+    def zero_grad(self):
+            for layer in self.model.layers:
+                if hasattr(layer, 'dLdW'):
+                    layer.dLdW.fill(0.0)
+                if hasattr(layer, 'dLdb'):
+                    layer.dLdb.fill(0.0)
