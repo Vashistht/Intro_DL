@@ -1,6 +1,6 @@
 import numpy as np
 
-class Activation():
+class Activation(): # using this as the base class for the activation functions
     
     def __init__(self):
         self.A = None
@@ -10,7 +10,10 @@ class Activation():
     
     def backward(self, dLdA):
         raise NotImplementedError
-
+'''
+Note: Terms used here/ structure of the code is inspired from Intro do DL taught by Professors Bhiksha Raj
+- using his slides and handout for reference of code structure
+'''
 
 class LinearActivation(Activation):
     """Implementation of the Linear Activation."""
