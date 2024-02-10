@@ -43,6 +43,17 @@ We see that the Adam optimizer with learning rate 0.01 performs the best in term
 
 Adam optimizer with learning rate 0.001 is lesser accurate, followed by vanilla SGD which gives the worst performance in terms of loss and accuracy. The decision boundary is also the most inaccurate.
 
+\subsection{ \textcolor{red}{Best Performance: MLP with Adam Optimizer of learning rate 0.01 and default parameters} }
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{plots/sinusoid_adam-lr1e-2_more_paramsloss_acc.png}
+    \caption{Loss and accuracy for Circle dataset (train, test set with 200 points each)\\ Adam optimizer (lr $=1e-2$ ), 400 epochs, Cost function: CrossEntropyLoss, Xaiver initialization}
+    \includegraphics[width=0.8\textwidth]{plots/sinusoid_adam-lr1e-2_more_paramsboundary.png}
+    \caption{(L2Loss) Decision boundary for Circle separable dataset (train, test set with 200 points each) 
+    Adam optimizer (lr $=1e-2$ )}
+\end{figure}
+
 \subsection{MLP with SGD Optimizer of learning rate 0.01 and default parameters (no momentum, no weight decay)}
 
 \begin{figure}[H]
@@ -67,16 +78,7 @@ Adam optimizer with learning rate 0.001 is lesser accurate, followed by vanilla 
 
 
 
-\subsection{MLP with Adam Optimizer of learning rate 0.01 and default parameters}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{plots/sinusoid_adam-lr1e-2_more_paramsloss_acc.png}
-    \caption{Loss and accuracy for Circle dataset (train, test set with 200 points each)\\ Adam optimizer (lr $=1e-2$ ), 400 epochs, Cost function: CrossEntropyLoss, Xaiver initialization}
-    \includegraphics[width=0.8\textwidth]{plots/sinusoid_adam-lr1e-2_more_paramsboundary.png}
-    \caption{(L2Loss) Decision boundary for Circle separable dataset (train, test set with 200 points each) 
-    Adam optimizer (lr $=1e-2$ )}
-\end{figure}
 
 \subsection{MLP with Adam Optimizer of learning rate 0.001 and default parameters}
 

@@ -1,7 +1,6 @@
 '''
 Implement Xavier initialization here
 Source: https://pytorch.org/docs/stable/_modules/torch/nn/init.html#xavier_uniform_
-
 - also HW 6, question 3 to Intro to ML (18661) -- xavier initialization
 '''
 

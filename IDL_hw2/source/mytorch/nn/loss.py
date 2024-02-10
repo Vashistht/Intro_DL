@@ -1,4 +1,3 @@
-# Path: mytorch/nn/initialization.py
 
 import numpy as np
 

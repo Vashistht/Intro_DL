@@ -12,11 +12,10 @@ class Activation(): # using this as the base class for the activation functions
         raise NotImplementedError
 '''
 Note: Terms used here/ structure of the code is inspired from Intro do DL taught by Professors Bhiksha Raj
-- using his slides and handout for reference of code structure
+- using his slides and handout for reference of code structure for HW
 '''
 
 class LinearActivation(Activation):
-    """Implementation of the Linear Activation."""
     def forward(self, A):
         self.A = A
         return self.A
@@ -27,7 +26,6 @@ class LinearActivation(Activation):
         return dLdZ
 
 class ReLU(Activation):
-    """Implementation of the ReLU Activation (Rectified Linear Unit)."""
     def forward(self, A):
         self.A = np.maximum(0, A)
         return self.A
@@ -38,7 +36,6 @@ class ReLU(Activation):
         return dLdZ
 
 class Sigmoid(Activation):
-    """Implementation of the Sigmoid Activation."""
     def forward(self, A):
         self.A = 1 / (1 + np.exp(-A))
         return self.A
@@ -49,7 +46,6 @@ class Sigmoid(Activation):
         return dLdZ
 
 class Tanh(Activation):
-    """Implementation of the TanH Activation (Hyperbolic Tangent)."""
     def forward(self, A):
         self.A = np.tanh(A)
         return self.A

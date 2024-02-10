@@ -48,15 +48,3 @@ class Linear:
             self.dLdA = dLdA
         
         return dLdA
-    
-    # @property #(looked it on gpt)
-    # def parameters(self):
-    #     return [{'params': self.W, 'grad': self.dLdW}, {'params': self.b, 'grad': self.dLdb}]
-    
-    # @property
-    # def parameters(self):
-    #     params_list = [{'params': self.W, 'grad': None}, {'params': self.b, 'grad': None}]
-    #     if hasattr(self, 'dLdW') and hasattr(self, 'dLdb'):
-    #         params_list[0]['grad'] = self.dLdW
-    #         params_list[1]['grad'] = self.dLdb
-    #     return params_list

@@ -1,0 +1,17 @@
+\BOOKMARK [1][-]{section.1}{Deliverable 1}{}% 1
+\BOOKMARK [1][-]{section.2}{Deliverable 2: Linear separable dataset}{}% 2
+\BOOKMARK [1][-]{section.3}{Deliverable 3: XOR problem}{}% 3
+\BOOKMARK [1][-]{section.4}{Deliverable 4: Differences in cost function \(Circle dataset\)}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{L2Loss}{section.4}% 5
+\BOOKMARK [2][-]{subsection.4.2}{CrossEntropyLoss}{section.4}% 6
+\BOOKMARK [1][-]{section.5}{Deliverable 5: Differences in Optimizers \(Sinusoidal dataset\)}{}% 7
+\BOOKMARK [2][-]{subsection.5.1}{Optimizer Performance}{section.5}% 8
+\BOOKMARK [2][-]{subsection.5.2}{ Best Performance: MLP with Adam Optimizer of learning rate 0.01 and default parameters }{section.5}% 9
+\BOOKMARK [2][-]{subsection.5.3}{MLP with SGD Optimizer of learning rate 0.01 and default parameters \(no momentum, no weight decay\)}{section.5}% 10
+\BOOKMARK [2][-]{subsection.5.4}{MLP with SGD Optimizer of learning rate 0.01 momentum 0.9, no weight decay}{section.5}% 11
+\BOOKMARK [2][-]{subsection.5.5}{MLP with Adam Optimizer of learning rate 0.001 and default parameters}{section.5}% 12
+\BOOKMARK [1][-]{section.6}{Deliverable 6: Swiss roll}{}% 13
+\BOOKMARK [1][-]{section.7}{Deliverable 6: Non-linear embeddings}{}% 14
+\BOOKMARK [2][-]{subsection.7.1}{Circular Data, Non-Linear Embedding: x2 + y2}{section.7}% 15
+\BOOKMARK [2][-]{subsection.7.2}{XOR Data, Non-Linear Embedding: xy}{section.7}% 16
+\BOOKMARK [2][-]{subsection.7.3}{Swiss-Roll Data, Non-Linear Embedding: x2, xy, y2}{section.7}% 17
