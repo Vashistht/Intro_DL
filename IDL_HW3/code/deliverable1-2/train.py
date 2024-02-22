@@ -111,15 +111,15 @@ if __name__ == "__main__":
     # set param
     setup_seed(18786)
     batch_size = 128
-    num_epoch = 10
+    num_epoch = 7
     lr = 1e-4
 
-    if torch.backends.mps.is_available():
-        print("Using MPS")
-        device = torch.device("mps")
-    else:
-        print("MPS not available, using CPU")
-        device = torch.device("cpu")
+    # if torch.backends.mps.is_available():
+    #     print("Using MPS")
+    #     device = torch.device("mps")
+    # else:
+    #     print("MPS not available, using CPU")
+    device = torch.device("cpu")
     
     ## Load dataset
 
@@ -129,8 +129,8 @@ if __name__ == "__main__":
     
     # trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=2)
     # valloader = torch.utils.data.DataLoader(valset, batch_size=batch_size, shuffle=False, num_workers=2)
-    trainloader = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, range(1, 1000)), batch_size=batch_size, shuffle=True, num_workers=2)
-    valloader = torch.utils.data.DataLoader(torch.utils.data.Subset(valset, range(1, 500)), batch_size=batch_size, shuffle=False, num_workers=2)
+    trainloader = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, range(1, 20000)), batch_size=batch_size, shuffle=True, num_workers=2)
+    valloader = torch.utils.data.DataLoader(torch.utils.data.Subset(valset, range(1, 5000)), batch_size=batch_size, shuffle=False, num_workers=2)
 
     print(f"LOAD DATASET: TRAIN {len(trainset)} | TEST: {len(valset)}")
     start = time.time()
@@ -138,7 +138,6 @@ if __name__ == "__main__":
     ## Load my neural network
     model = Net().to(device)
 
-    ## Define the criterion and optimizer
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     
@@ -160,10 +159,10 @@ if __name__ == "__main__":
         val_accuracy.append(val_acc_epoch)
         val_loss.append(val_loss_epoch)
         
-        print(f"Epoch {epoch+1} | Train Loss: {train_loss_epoch:.4f} | Train Acc: {train_acc_epoch:.4f} | Val Loss: {val_loss_epoch:.4f} | Val Acc: {val_acc_epoch:.4f}")
-
+        print(f"Epoch {epoch+1}  | Train Loss: {train_loss_epoch:.4f} | Train Acc: {train_acc_epoch:.4f} | Val Loss: {val_loss_epoch:.4f} | Val Acc: {val_acc_epoch:.4f}")
+    end = time.time()
+    print(f"Training time: {end-start:.4f}s")
     ## Plot the loss and accuracy curves
-    # create a subplot 1 column and 2 rows
     fig, ax = plt.subplots(1,2, figsize=(10,5))
     ax[0].plot(train_loss, label='Train Loss')
     ax[0].plot(val_loss, label='Val Loss')
@@ -183,3 +182,24 @@ if __name__ == "__main__":
     plt.show()
     end = time.time()
     print(f"Training time: {end-start:.4f}s")
+    
+     ## Plot the loss and accuracy curves
+    fig, ax = plt.subplots(1,2, figsize=(10,5))
+    ax[0].plot(train_loss, label='Train Loss')
+    ax[0].plot(val_loss, label='Val Loss')
+    ax[0].set_title('Loss')
+    ax[0].set_xlabel('Epoch')
+    ax[0].set_ylabel('Loss')
+    ax[0].legend()
+    
+    ax[1].plot(train_accuracy, label='Train Acc')
+    ax[1].plot(val_accuracy, label='Val Acc')
+    ax[1].set_title('Accuracy')
+    ax[1].legend()
+    ax[1].set_xlabel('Epoch')
+    ax[1].set_ylabel('Accuracy')
+    ax[1].axhline(y=0.9, color='r', linestyle='--', label='90% cut-off')
+    ax[1].legend()
+    plt.savefig('train-loss-curve-del1.png')
+    plt.show()
+ 

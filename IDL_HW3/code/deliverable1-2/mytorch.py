@@ -42,6 +42,8 @@ def MyFConv2D(input, weight, bias=None, stride=1, padding=0):
     
     output = torch.zeros(N, C_out, H_out, W_out, device = input.device) # initalise output tensor
     
+    weight = weight.to(input.device)
+    bias = bias.to(input.device)
     ## Convolution
     for h in range(H_out):
         for w in range(W_out):
