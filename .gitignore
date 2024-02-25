@@ -1,2 +1,12 @@
 
 IDL_hw2/source/hw1p1_autograder.py
+*.meta
+IDL_HW3/code/deliverable3-5/data/cifar-10-batches-py/data_batch_1
+IDL_HW3/code/deliverable3-5/data/cifar-10-batches-py/data_batch_3
+IDL_HW3/code/deliverable3-5/data/cifar-10-batches-py/data_batch_2
+IDL_HW3/code/deliverable3-5/data/cifar-10-batches-py/data_batch_2
+IDL_HW3/code/deliverable3-5/data/cifar-10-batches-py/data_batch_4
+IDL_HW3/code/deliverable3-5/data/cifar-10-batches-py/readme.html
+IDL_HW3/code/deliverable3-5/data/cifar-10-python.tar.gz
+IDL_HW3/code/deliverable3-5/data/cifar-10-batches-py/test_batch
+IDL_HW3/code/deliverable3-5/data/cifar-10-batches-py/data_batch_5
