@@ -72,7 +72,7 @@ def train(model, trainloader):
     total = 0
     for i, data in enumerate(trainloader, 0):
         inputs, labels = data[0].to(device), data[1].to(device)
-        inputs, labels = data
+        # inputs, labels = data
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = criterion(outputs, labels)
@@ -94,7 +94,7 @@ def validation(model, valloader):
     total = 0
     for i,data in enumerate(valloader, 0):
         inputs, labels = data[0].to(device), data[1].to(device)
-        inputs, labels = data
+        # inputs, labels = data
         outputs = model(inputs)
         loss = criterion(outputs, labels)
         running_loss += loss.item()
@@ -127,10 +127,9 @@ if __name__ == "__main__":
     trainset = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transforms.ToTensor())
     valset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transforms.ToTensor())
     
-    # trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=2)
-    # valloader = torch.utils.data.DataLoader(valset, batch_size=batch_size, shuffle=False, num_workers=2)
-    trainloader = torch.utils.data.DataLoader(torch.utils.data.Subset(trainset, range(1, 20000)), batch_size=batch_size, shuffle=True, num_workers=2)
-    valloader = torch.utils.data.DataLoader(torch.utils.data.Subset(valset, range(1, 5000)), batch_size=batch_size, shuffle=False, num_workers=2)
+    trainloader = torch.utils.data.DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=2)
+    valloader = torch.utils.data.DataLoader(valset, batch_size=batch_size, shuffle=False, num_workers=2)
+
 
     print(f"LOAD DATASET: TRAIN {len(trainset)} | TEST: {len(valset)}")
     start = time.time()
@@ -162,26 +161,7 @@ if __name__ == "__main__":
         print(f"Epoch {epoch+1}  | Train Loss: {train_loss_epoch:.4f} | Train Acc: {train_acc_epoch:.4f} | Val Loss: {val_loss_epoch:.4f} | Val Acc: {val_acc_epoch:.4f}")
     end = time.time()
     print(f"Training time: {end-start:.4f}s")
-    ## Plot the loss and accuracy curves
-    fig, ax = plt.subplots(1,2, figsize=(10,5))
-    ax[0].plot(train_loss, label='Train Loss')
-    ax[0].plot(val_loss, label='Val Loss')
-    ax[0].set_title('Loss')
-    ax[0].set_xlabel('Epoch')
-    ax[0].set_ylabel('Loss')
-    ax[0].legend()
     
-    ax[1].plot(train_accuracy, label='Train Acc')
-    ax[1].plot(val_accuracy, label='Val Acc')
-    ax[1].set_title('Accuracy')
-    ax[1].legend()
-    ax[1].set_xlabel('Epoch')
-    ax[1].set_ylabel('Accuracy')
-    ax[1].legend()
-    plt.savefig('train-loss-curve-del1.png')
-    plt.show()
-    end = time.time()
-    print(f"Training time: {end-start:.4f}s")
     
      ## Plot the loss and accuracy curves
     fig, ax = plt.subplots(1,2, figsize=(10,5))
