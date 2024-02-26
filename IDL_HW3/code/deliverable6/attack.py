@@ -8,6 +8,15 @@ import numpy as np
 import torch.optim as optim
 import matplotlib.pyplot as plt
 
+# from recitation
+class Normalize(nn.Module):
+    def __init__(self, mean, std):
+        super(Normalize, self).__init__()
+        self.mean = torch.Tensor(mean)
+        self.std = torch.Tensor(std)
+    def forward(self, x):
+        return (x - self.mean.type_as(x)[None,:,None,None]) / self.std.type_as(x)[None,:,None,None]
+
 
 #evaluate the benign accuracy of a model
 def test(model, x,y,batch_size):
