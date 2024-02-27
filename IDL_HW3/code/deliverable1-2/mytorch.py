@@ -7,8 +7,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-# added: https://github.com/jariasf/CS231n/blob/master/assignment2/cs231n/fast_layers.py
-
 def MyFConv2D(input, weight, bias=None, stride=1, padding=0):
     
     """
