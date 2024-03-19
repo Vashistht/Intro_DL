@@ -135,7 +135,7 @@ def validation(model, valloader, device):
     return avg_loss, accuracy
 
 
-def plot_cam(cam_img, img, idx):
+def plot_cam(cam_img, img, idx): # for plotting the cam result for a given index
     fig, ax = plt.subplots(1,3, figsize=(10,5))
     ax[0].imshow(img)
     ax[0].set_title('Raw Image')

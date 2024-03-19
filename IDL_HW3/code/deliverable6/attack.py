@@ -1,3 +1,4 @@
+# most of the stuff here is based on recitation 3 notebook other than the imoprovements I have added 
 # %%
 #import packages
 #feel free to import more if you need
