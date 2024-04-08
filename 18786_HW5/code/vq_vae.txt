@@ -1,0 +1,35 @@
+cuda
+Files already downloaded and verified
+Files already downloaded and verified
+
+500 iterations
+recon_error: 0.404
+
+1000 iterations
+recon_error: 0.243
+
+1500 iterations
+recon_error: 0.187
+
+2000 iterations
+recon_error: 0.166
+
+2500 iterations
+recon_error: 0.153
+
+3000 iterations
+recon_error: 0.143
+
+3500 iterations
+recon_error: 0.129
+
+4000 iterations
+recon_error: 0.118
+
+4500 iterations
+recon_error: 0.105
+
+5000 iterations
+recon_error: 0.096
+
+OMP: Info #276: omp_set_nested routine deprecated, please use omp_set_max_active_levels instead.
