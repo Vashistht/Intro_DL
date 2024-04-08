@@ -65,7 +65,8 @@ class VectorQuantizer(nn.Module):
 
         self._embedding_dim = embedding_dim
         self._num_embeddings = num_embeddings
-
+        self.use_commitment_loss = use_commitment_loss
+        
         self._embedding = nn.Embedding(self._num_embeddings, self._embedding_dim)
         self._embedding.weight.data.uniform_(-1/self._num_embeddings, 1/self._num_embeddings)
         self._commitment_cost = commitment_cost
@@ -96,7 +97,7 @@ class VectorQuantizer(nn.Module):
         q_latent_loss = F.mse_loss(quantized, inputs.detach())
         loss = q_latent_loss + self._commitment_cost * e_latent_loss
 
-        if self._use_commitment_loss:
+        if self.use_commitment_loss:
             loss = q_latent_loss + self._commitment_cost * e_latent_loss
         else:
             loss = q_latent_loss
