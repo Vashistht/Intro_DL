@@ -307,7 +307,7 @@ for i in xrange(num_training_updates):
 # %%
 train_res_recon_error_smooth = savgol_filter(train_res_recon_error, 201, 7)
 # Save the smoothed data
-np.save('train_res_recon_error_smooth.npy', train_res_recon_error_smooth)
+# np.save('train_res_recon_error_smooth.npy', train_res_recon_error_smooth)
 # train_res_recon_error_smooth = np.load('train_res_recon_error_smooth.npy')
 # %%
 plt.figure(figsize=(12,6))
@@ -315,7 +315,7 @@ plt.plot(train_res_recon_error_smooth)
 plt.yscale('log')
 plt.title('Smoothed NMSE.')
 plt.xlabel('iteration')
-plt.savefig('nmse.png')
+plt.savefig('nmse_nocommit.png')
 
 # %% [markdown]
 # ## View Reconstructions
@@ -338,8 +338,8 @@ torch.max(model._encoder(valid_originals))
 train_originals = train_originals.to(device)
 _, train_reconstructions, _, _ = model._vq_vae(train_originals)
 
-torch.save(valid_reconstructions, 'valid_reconstructions.pt')
-torch.save(valid_originals, 'valid_originals.pt')
+# torch.save(valid_reconstructions, 'valid_reconstructions.pt')
+# torch.save(valid_originals, 'valid_originals.pt')
 
 
 # # %%
@@ -368,8 +368,8 @@ def save_new(img, file_path):
 # # %% [markdown]
 # # ## View Embedding
 
-valid_reconstructions = torch.load('valid_reconstructions_nocommitment.pt')
-valid_originals = torch.load('valid_originals_nocommitment.pt')
+# valid_reconstructions = torch.load('valid_reconstructions_nocommitment.pt')
+# valid_originals = torch.load('valid_originals_nocommitment.pt')
 
 # Plot
 save_new(make_grid(valid_reconstructions.cpu().data + 0.5), 'make_grid_reconstruction_nocommitment.png')
@@ -386,7 +386,7 @@ proj = umap.UMAP(n_neighbors=3,
                  min_dist=0.1,
                  metric='cosine').fit_transform(model._vq_vae._embedding.weight.data.cpu())
 
-np.save('umap_embeddings_nocommitment.npy', proj)
+# np.save('umap_embeddings_nocommitment.npy', proj)
 
 # proj = np.load('umap_embeddings.npy')
 
